@@ -1,1 +1,1 @@
-<?php //$this->view();?>
+<?php $this->view();?>

@@ -12,11 +12,11 @@ class smpe_action
     protected $reponse = array(
         'title'       =>'',
         'description' =>'',
-        'layout'      =>'', //默认为空值
+        'layout'      =>'', //empty default
     );
 
     /**
-     * @var array  页面动态数据: 子类中赋值
+     * @var array
      */
     protected $data = array();
 
@@ -29,21 +29,19 @@ class smpe_action
     }
 
     /**
-     * 初始化$req参数
      * @param $request
-     * @param $isRun
-     * @return array
      */
     public function init($request)
     {
         $this->request = $request;
+    }
 
-        return call_user_func_array(array($this, $request['action']), $request['args']);
+    public function load() {
+
     }
 
     /**
-    * 显示view, 从layout开始
-    * @param string $layout normal blank empty app_money
+    * @param string $layout
     */
     protected function layout($layout = 'normal')
     {
@@ -60,7 +58,7 @@ class smpe_action
     protected function view($htmlPath = '')
     {
         if(empty($htmlPath)) {
-            $htmlPath = sprintf('%s/views/%s/%s_%s.php', $this->request['working_dir'], $this->req['module'], $this->req['controller'], $this->req['action']);
+            $htmlPath = sprintf('%s/views/%s/%s_%s.php', $this->request['working_dir'], $this->request['module'], $this->request['controller'], $this->request['action']);
         }
         if(!is_file($htmlPath)){
             throw new Exception('Cannot load view file: '.$htmlPath);
@@ -70,7 +68,6 @@ class smpe_action
     }
 
     /**
-     * 构建请求失败返回数组
      * @param string $message
      * @param mixed $data
      * @return array
@@ -81,7 +78,6 @@ class smpe_action
     }
 
     /**
-     * 构建请求成功返回数组
      * @param mixed $data
      * @param string $message
      * @return array

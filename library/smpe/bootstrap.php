@@ -53,6 +53,7 @@ class smpe_bootstrap
         } else {
             $path = smpe_filter::string('p', INPUT_GET);
         }
+        
         //args
         self::$request['args'] = explode('/', $path);
         //Remove "/" at begin.
@@ -91,6 +92,11 @@ class smpe_bootstrap
         }
 
         $init = $obj->init(self::$request);
+
+        $init = $obj->load();
+
+        $r = call_user_func_array(array($obj, self::$request['action']), self::$request['args']);
+
         //if($init['data'] <= 0) {
         //    throw new Exception('Page run check failed: '.$init['msg']);
         //}
