@@ -2,7 +2,7 @@
 class smpe_filter
 {
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中数组数据(不安全)
+     * Gets a specific external variable by name and optionally filters it (Unsafe)
      * @param string $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
      * @return array
@@ -13,7 +13,7 @@ class smpe_filter
     }
 
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中布尔格式数据
+     * Gets a specific external variable by name and optionally filters it
      * @param mixed $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
      * @return boolean
@@ -24,7 +24,7 @@ class smpe_filter
     }
 
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中E-MAIL格式数据
+     * Gets a specific external variable by name and optionally filters it
      * @param string $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
      * @return string
@@ -35,7 +35,7 @@ class smpe_filter
     }
 
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中货币格式数据
+     * Gets a specific external variable by name and optionally filters it
      * @param $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
      * @return float
@@ -46,7 +46,7 @@ class smpe_filter
     }
 
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中HTML格式数据(不安全)
+     * Gets a specific external variable by name and optionally filters it (Unsafe)
      * @param string $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
      * @return string
@@ -59,7 +59,7 @@ class smpe_filter
     }
 
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中HTML格式数据 (移除所有超级链接)(不安全)
+     * Gets a specific external variable by name and optionally filters it (Unsafe)
      * @param string $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
      * @return string
@@ -72,7 +72,7 @@ class smpe_filter
     }
 
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中数字格式数据
+     * Gets a specific external variable by name and optionally filters it
      * @param $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
      * @return int
@@ -83,7 +83,7 @@ class smpe_filter
     }
 
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中排序数据
+     * Gets a specific external variable by name and optionally filters it
      * @param string $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
      * @return string
@@ -110,7 +110,7 @@ class smpe_filter
     }
 
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中数据(不安全)
+     * Gets a specific external variable by name and optionally filters it (Unsafe)
      * @param string $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
      * @return string
@@ -121,7 +121,7 @@ class smpe_filter
     }
 
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中字符格式数据
+     * Gets a specific external variable by name and optionally filters it
      * The translations performed are:
      *  '&' (ampersand) becomes '&amp;'
      *  '"' (double quote) becomes '&quot;' when ENT_NOQUOTES is not set.
@@ -140,7 +140,7 @@ class smpe_filter
     }
 
     /**
-     * 读取 GET POST COOKIE SERVER ENV 中URL格式数据
+     * Gets a specific external variable by name and optionally filters it
      * @param string $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
      * @return string

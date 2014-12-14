@@ -13,6 +13,9 @@ header("Content-type: text/html; charset=UTF-8");
 
 class smpe_bootstrap
 {
+    /**
+     * @var array
+     */
     private static $request = array(
         'module' => '',
         'controller' => '',
@@ -22,14 +25,23 @@ class smpe_bootstrap
         'domain' => '',
     );
 
+    /**
+     * @param $p
+     */
     private static function initWorkingDir($p) {
         self::$request['working_dir'] = $p;
     }
 
+    /**
+     *
+     */
     private static function initDomain() {
         self::$request['domain'] = strstr($_SERVER['HTTP_HOST'], '.');
     }
 
+    /**
+     * @throws Exception
+     */
     private static function initConfig() {
         //FIXME: filter IP address.
         $conf = sprintf("%s/conf/config%s.php", self::$request['working_dir'], self::$request['domain']);
@@ -40,11 +52,19 @@ class smpe_bootstrap
         }
     }
 
+    /**
+     * @param $className
+     */
     public static function autoload($className) {
         $path = sprintf('%s/library/%s.php', self::$request['working_dir'], str_replace('_', DIRECTORY_SEPARATOR, $className));
-        if(is_file($path)) require $path;
+        if(is_file($path)) {
+            require $path;
+        }
     }
 
+    /**
+     *
+     */
     private static function initRequest() {
         if(config::$isRewrite){
             $path = parse_url(smpe_filter::string('REQUEST_URI', INPUT_SERVER), PHP_URL_PATH);
@@ -66,6 +86,9 @@ class smpe_bootstrap
         self::$request['action'] = empty(self::$request['args'][0]) ? 'index' : array_shift(self::$request['args']);
     }
 
+    /**
+     * @throws Exception
+     */
     private static function initController() {
         $path = sprintf("%s/controllers/%s/%s.php", self::$request['working_dir'], self::$request['module'], self::$request['controller']);
         if(!is_file($path)){
@@ -91,9 +114,9 @@ class smpe_bootstrap
             throw new Exception('Method not exists: '.$className.'->'.self::$request['action']);
         }
 
-        $init = $obj->init(self::$request);
+        $obj->init(self::$request);
 
-        $init = $obj->load();
+        $obj->load();
 
         $r = call_user_func_array(array($obj, self::$request['action']), self::$request['args']);
 
@@ -102,6 +125,10 @@ class smpe_bootstrap
         //}
     }
 
+    /**
+     * @param $workingDir
+     * @throws Exception
+     */
     public static function run($workingDir) {
         self::initWorkingDir($workingDir);
         self::initDomain();

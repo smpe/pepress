@@ -36,6 +36,9 @@ class smpe_action
         $this->request = $request;
     }
 
+    /**
+     *
+     */
     public function load() {
 
     }
@@ -52,9 +55,10 @@ class smpe_action
     }
 
     /**
-    * Load view file.
-    * @param string $htmlPath
-    */
+     * Load view file.
+     * @param string $htmlPath
+     * @throws Exception
+     */
     protected function view($htmlPath = '')
     {
         if(empty($htmlPath)) {
@@ -89,6 +93,7 @@ class smpe_action
 
     /**
      * Initiates a transaction
+     * @param string $module
      * @throws Exception
      */
     protected function beginTransaction($module = '')
@@ -106,6 +111,7 @@ class smpe_action
 
     /**
      * Commits a transaction
+     * @param string $module
      * @throws Exception
      */
     protected function commit($module = '')
@@ -123,6 +129,7 @@ class smpe_action
 
     /**
      * Roll back a transaction
+     * @param string $module
      */
     protected function rollBack($module = '')
     {
