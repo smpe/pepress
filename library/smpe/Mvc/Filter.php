@@ -1,5 +1,5 @@
 <?php
-class smpe_filter
+class Smpe_Mvc_filter
 {
     /**
      * Gets a specific external variable by name and optionally filters it (Unsafe)

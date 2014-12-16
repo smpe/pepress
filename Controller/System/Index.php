@@ -1,5 +1,5 @@
 <?php
-class controller_system_index extends smpe_action 
+class Controller_System_Index extends Smpe_Mvc_Action
 {
 	public function index() {
 		$this->layout();

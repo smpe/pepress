@@ -1,20 +1,21 @@
 <?php
-class system_user
+namespace Modules\System;
+
+class User
 {
     /**
-     * @var smpe_mysql
+     * @var Smpe_Db_Mysql
      */
     private static $data = null;
 
     /**
-     * @return smpe_mysql
+     * @return Smpe_Db_Mysql
      */
     public static function data()
     {
         if(is_null(self::$data)) {
-            self::$data = new smpe_mysql('system', 'user', 'user_id');
+            self::$data = new Smpe_Db_Mysql('System', 'user', 'user_id');
         }
         return self::$data;
     }
-
 }

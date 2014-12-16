@@ -1,5 +1,5 @@
 <?php
-class config
+class Config
 {
 	/**
 	 * @var number 0:development 1:testing 2:staging 3:production
@@ -20,13 +20,13 @@ class config
 	 * @var array modules
 	 */
 	public static $modules = array(
-		'system' => array('data'=>'system'),
+		'System' => array('db'=>'Default'),
 	);
 
 	/**
 	 * @var array DSN
 	 */
 	public static $db = array(
-		'system' => array('server' => 'localhost', 'port' => 3306, 'user' => 'root', 'password' => '', 'database' => 'system', 'profiling' => false),
+		'Default' => array('type'=>'Mysql', 'server'=>'localhost', 'port'=>3306, 'user'=>'root', 'password'=>'', 'database'=>'system', 'profiling'=>false),
 	);
 }

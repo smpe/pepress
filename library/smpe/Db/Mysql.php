@@ -1,5 +1,5 @@
 <?php
-class smpe_mysql
+class Smpe_Db_Mysql implements Smpe_Db_Interface
 {
     /**
      * @var string module name
@@ -19,17 +19,12 @@ class smpe_mysql
     /**
      * @var array join tables
      */
-    public $joins = array();
+    private $joins = array();
 
     /**
      * @var PDO database instance
      */
     private static $db = array();
-
-    /**
-     * @var int throw a PDOException and set its properties to reflect the error code and error information
-     */
-    public static $exceptions = 0;
 
     /**
      * @var int Query counter
@@ -80,10 +75,10 @@ class smpe_mysql
      * @param $table
      * @param $primary
      */
-    function __construct($module, $table, $primary)
+    public function __construct($module, $table, $primary)
     {
         $this->module  = $module;
-        $this->table   = $module . '_' . $table;
+        $this->table   = strtolower($module) . '_' . $table;
         $this->primary = $primary;
     }
 
@@ -122,11 +117,7 @@ class smpe_mysql
             return $statement;
         } catch (PDOException $e) {
             //trigger_error($e->getMessage()."\r\n".$e->getTraceAsString()."\r\n".$sql."\r\n".var_export($parameters, true));
-            if(self::$exceptions > 0){
-                throw new Exception($e->getMessage());
-            } else {
-                return false;
-            }
+            throw new Exception($e->getMessage());
         }
     }
 
@@ -138,12 +129,18 @@ class smpe_mysql
      * @param array $parameters
      * @param int $pageIndex
      * @param int $pageSize
-     * @param string $lock Empty, FOR UPDATE , LOCK IN SHARE MODE
-     * @param $fetchType
+     * @param array $opts
      * @return array|bool|string
      */
-    public function fetchAll($fields = 'a.*', $join = '', $where = '1', $parameters = array(), $pageIndex = 0, $pageSize = 10000, $lock = '', $fetchType = PDO::FETCH_ASSOC)
+    public function fetchAll($fields = 'a.*', $join = '', $where = '1', $parameters = array(), $pageIndex = 0, $pageSize = 10000, $opts = array())
     {
+        $lock = empty($opts['lock']) ? '' : $opts['lock'];
+        switch($lock) {
+            case 0: $lock = ''; break;
+            case 1: $lock = 'FOR UPDATE'; break;
+            case 2: $lock = 'LOCK IN SHARE MODE'; break;
+        }
+        $fetchType = empty($opts['fetch_type']) ? PDO::FETCH_ASSOC : $opts['fetch_type'];
         $sql = sprintf("SELECT %s FROM `%s` a %s WHERE %s LIMIT %d, %d %s", $fields, $this->table, $join, $where, $pageIndex, $pageSize, $lock);
         return $this->query($sql, $parameters)->fetchAll($fetchType);
     }
@@ -155,13 +152,13 @@ class smpe_mysql
      * @param array $order array('a.user_id' => '0', 'b.gender' => '1')
      * @param int $pageIndex
      * @param int $pageSize
-     * @param string $lock Empty, FOR UPDATE , LOCK IN SHARE MODE
+     * @param int $lock
      * @return array|bool|string
      */
-    public function all($filter = array(), $group = '', $order = array(), $pageIndex = 0, $pageSize = 10000, $lock = '')
+    public function all($filter = array(), $group = '', $order = array(), $pageIndex = 0, $pageSize = 10000, $lock = 0)
     {
         $where = $this->where($filter, $group, $order);
-        return $this->fetchAll('a.*', $where['join'], $where['where'], $where['param'], $pageIndex, $pageSize, $lock);
+        return $this->fetchAll('a.*', $where['join'], $where['where'], $where['param'], $pageIndex, $pageSize, array('lock'=>$lock));
     }
 
     /**
@@ -172,13 +169,13 @@ class smpe_mysql
      * @param array $order array('a.user_id' => '0', 'b.gender' => '1')
      * @param int $pageIndex
      * @param int $pageSize
-     * @param string $lock Empty, FOR UPDATE , LOCK IN SHARE MODE
+     * @param int $lock
      * @return array|bool|string
      */
-    public function lst($column = 'a.*', $filter = array(), $group = '', $order = array(), $pageIndex = 0, $pageSize = 10000, $lock = '')
+    public function lst($column = 'a.*', $filter = array(), $group = '', $order = array(), $pageIndex = 0, $pageSize = 10000, $lock = 0)
     {
         $where = $this->where($filter, $group, $order);
-        return $this->fetchAll($column, $where['join'], $where['where'], $where['param'], $pageIndex, $pageSize, $lock);
+        return $this->fetchAll($column, $where['join'], $where['where'], $where['param'], $pageIndex, $pageSize, array('lock'=>$lock));
     }
 
     /**
@@ -186,13 +183,13 @@ class smpe_mysql
      * @param array $filter array('user_id' => '2', 'gender' => 'male')
      * @param string $group
      * @param array $order array('a.user_id' => '0', 'b.gender' => '1')
-     * @param string $lock Empty, FOR UPDATE , LOCK IN SHARE MODE
+     * @param int $lock
      * @return array|bool|string
      */
-    public function row($filter = array(), $group = '', $order = array(), $lock = '')
+    public function row($filter = array(), $group = '', $order = array(), $lock = 0)
     {
         $where = $this->where($filter, $group, $order);
-        $result = $this->fetchAll('a.*', $where['join'], $where['where'], $where['param'], 0, 1, $lock);
+        $result = $this->fetchAll('a.*', $where['join'], $where['where'], $where['param'], 0, 1, array('lock'=>$lock));
         return (empty($result) ? $result : $result[0]);
     }
 
@@ -201,13 +198,13 @@ class smpe_mysql
      * @param array $filter array('user_id' => '2', 'gender' => 'male')
      * @param string $group
      * @param array $order array('a.user_id' => '0', 'b.gender' => '1')
-     * @param string $lock Empty, FOR UPDATE , LOCK IN SHARE MODE
+     * @param int $lock
      * @return string
      */
-    public function val($column = 'COUNT(*)', $filter = array(), $group = '', $order = array(), $lock = '')
+    public function val($column = 'COUNT(*)', $filter = array(), $group = '', $order = array(), $lock = 0)
     {
         $where = $this->where($filter, $group, $order);
-        $result = $this->fetchAll($column, $where['join'], $where['where'], $where['param'], 0, 1, $lock, PDO::FETCH_NUM);
+        $result = $this->fetchAll($column, $where['join'], $where['where'], $where['param'], 0, 1, array('lock'=>$lock, 'fetch_type'=>PDO::FETCH_NUM));
         return (empty($result) ? '' : $result[0][0]);
     }
 
@@ -228,11 +225,8 @@ class smpe_mysql
         else{
             //TODO: 含用group by的条件的行数计算, 暂时拷贝fetchAll()方法
             $where = $this->where($filter, $group, $order);
-
             $sql = sprintf("SELECT COUNT(*) FROM (SELECT 1 FROM `%s` a %s WHERE %s %s) b", $this->table, $where['join'], $where['where'], $lock);
-
             $result = $this->query($sql, $where['param'])->fetchAll(PDO::FETCH_NUM);
-
             return (empty($result) ? 0 : (int)$result[0][0]);
         }
     }
@@ -240,12 +234,13 @@ class smpe_mysql
     /**
      * Read a single line, according to the primary key
      * @param string $primaryId
+     * @param int $lock
      * @return array
      */
-    public function item($primaryId)
+    public function item($primaryId, $lock = 0)
     {
         $where = $this->where(array($this->primary => $primaryId), '', false);
-        $result = $this->fetchAll('a.*', $where['join'], $where['where'], $where['param']);
+        $result = $this->fetchAll('a.*', $where['join'], $where['where'], $where['param'], 0, 1, array('lock'=>$lock));
         return (empty($result) ? $result : $result[0]);
     }
 
@@ -305,7 +300,7 @@ class smpe_mysql
      * @param array $order
      * @return array
      */
-    public function where($filter, $group = '', $order = array())
+    private function where($filter, $group = '', $order = array())
     {
         $result = array('join_tables' => array(), 'join' => '', 'where' => ' 1 ', 'param' => array());
 
