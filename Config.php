@@ -29,4 +29,9 @@ class Config
 	public static $db = array(
 		'Default' => array('type'=>'Mysql', 'server'=>'localhost', 'port'=>3306, 'user'=>'root', 'password'=>'', 'database'=>'system', 'profiling'=>false),
 	);
+
+	/**
+	 * @var string Default module
+	 */
+	public static $defaultModule = 'System';
 }
