@@ -20,18 +20,18 @@ class Config
 	 * @var array modules
 	 */
 	public static $modules = array(
-		'System' => array('db'=>'Default'),
+		'Support' => array('db'=>'Support'),
 	);
 
 	/**
 	 * @var array DSN
 	 */
 	public static $db = array(
-		'Default' => array('type'=>'Mysql', 'server'=>'localhost', 'port'=>3306, 'user'=>'root', 'password'=>'', 'database'=>'system', 'profiling'=>false),
+		'Support' => array('type'=>'Mysql', 'server'=>'localhost', 'port'=>3306, 'user'=>'root', 'password'=>'', 'database'=>'system', 'profiling'=>false),
 	);
 
 	/**
 	 * @var string Default module
 	 */
-	public static $defaultModule = 'System';
+	public static $defaultModule = 'Support';
 }
