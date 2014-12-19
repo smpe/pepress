@@ -18,13 +18,15 @@ class Smpe_Mvc_Url
     }
 
     private static function fullUrl($schema, $args) {
-        $module = array_shift($args);
+        $module = empty($args) ? Config::$defaultModule : array_shift($args);
         $domain = empty(Config::$modules[$module]['listen']) ? Smpe_Mvc_Bootstrap::$request['host'] : Config::$modules[$module]['listen'];
-        $url = sprintf("%s://%s", $schema, $domain);
+        $url = sprintf("%s://%s%s", $schema, $domain, Config::$vDir);
         if(empty($args)) {
             return $url;
-        } else {
+        } else if(Config::$isRewrite) {
             return sprintf('%s/%s/%s', $url, $module, implode('/', $args));
+        } else {
+            return sprintf('%s?p=/%s/%s', $url, $module, implode('/', $args));
         }
     }
 }

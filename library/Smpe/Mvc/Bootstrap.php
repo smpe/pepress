@@ -117,10 +117,10 @@ class Smpe_Mvc_Bootstrap
     private static function initArgs() {
         //vDir
         if(Config::$isRewrite){
-            $path = parse_url(Smpe_Mvc_filter::string('REQUEST_URI', INPUT_SERVER), PHP_URL_PATH);
+            $path = parse_url(Smpe_Mvc_Filter::string('REQUEST_URI', INPUT_SERVER), PHP_URL_PATH);
             $path = substr($path, strlen(config::$vDir));
         } else {
-            $path = Smpe_Mvc_filter::string('p', INPUT_GET);
+            $path = Smpe_Mvc_Filter::string('p', INPUT_GET);
         }
         
         //args

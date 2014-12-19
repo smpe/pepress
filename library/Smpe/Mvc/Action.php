@@ -62,7 +62,7 @@ class Smpe_Mvc_Action
     /**
     * @param string $layout
     */
-    protected function layout($layout = 'normal') {
+    protected function layout($layout = 'Normal') {
         //ob_start();
         $htmlPath = sprintf('%s/layout/%s.php',Smpe_Mvc_Bootstrap::$workingDir, $layout);
         $this->view($htmlPath);
