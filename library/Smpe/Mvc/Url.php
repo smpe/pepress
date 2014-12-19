@@ -10,11 +10,11 @@ class Smpe_Mvc_Url
     }
 
     public static function pub($path) {
-        return $path.'?time='.Config::$version;
+        return sprintf("%s%s?time=%d", Config::$vDir, $path, Config::$version);
     }
 
     public static function theme($path) {
-        return '/src/themes/default'.$path.'?time='.Config::$version;
+        return sprintf("%s/src/themes/default%s?time=%d", Config::$vDir, $path, Config::$version);
     }
 
     private static function fullUrl($schema, $args) {
