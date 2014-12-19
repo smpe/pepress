@@ -8,16 +8,18 @@ class Smpe_Mvc_Bootstrap
     /**
      * @var string
      */
-    private static $workingDir = '';
+    public static $workingDir = '';
 
     /**
      * @var array
      */
-    private static $request = array(
+    public static $request = array(
         'module' => '',
-        'controller' => '',
-        'action' => '',
+        'controller' => 'Index',
+        'action' => 'Index',
         'args' => array(),
+        'protocol' => '',
+        'host' => '',
         'domain' => '',
     );
 
@@ -38,7 +40,12 @@ class Smpe_Mvc_Bootstrap
      * Domain
      */
     private static function initDomain() {
+        self::$request['protocol'] = $_SERVER['SERVER_PORT'] == '443' ? 'https' : 'http';
+        self::$request['host'] = $_SERVER['HTTP_HOST'];
         self::$request['domain'] = strstr($_SERVER['HTTP_HOST'], '.');
+        if(empty(self::$request['domain'])) {
+            self::$request['domain'] = $_SERVER['HTTP_HOST'];
+        }
     }
 
     /**
@@ -54,7 +61,7 @@ class Smpe_Mvc_Bootstrap
      */
     private static function initConfig($path = '') {
         if(empty($path)){
-            $path = sprintf("%s/config%s.php", self::$workingDir, self::$request['domain']);
+            $path = sprintf("%s/Config.php", self::$workingDir);
         }
 
         if(is_file($path)) {
@@ -80,9 +87,37 @@ class Smpe_Mvc_Bootstrap
      * Request
      */
     private static function initRequest() {
+        self::initArgs();
+
+        //module
+        if(empty(self::$request['args'][0]) || self::$request['args'][0] == 'index.php'){
+            self::$request['module'] = Config::$defaultModule;
+        } else {
+            self::$request['module'] = array_shift(self::$request['args']);
+        }
+
+        //controller
+        if(!empty(self::$request['args'][0])) {
+            self::$request['controller'] = array_shift(self::$request['args']);
+        }
+
+        //action
+        if(!empty(self::$request['args'][0])) {
+            self::$request['action'] = array_shift(self::$request['args']);
+        }
+    }
+
+    private static function initActionName() {
+        $a = ord(self::$request['action']);
+        if($a < 65 || $a > 90) {
+            throw new Exception('The first letter of the method name must be capitalized: '.self::$request['action']);
+        }
+    }
+
+    private static function initArgs() {
+        //vDir
         if(Config::$isRewrite){
             $path = parse_url(Smpe_Mvc_filter::string('REQUEST_URI', INPUT_SERVER), PHP_URL_PATH);
-            //vDir
             $path = substr($path, strlen(config::$vDir));
         } else {
             $path = Smpe_Mvc_filter::string('p', INPUT_GET);
@@ -90,17 +125,11 @@ class Smpe_Mvc_Bootstrap
         
         //args
         self::$request['args'] = explode('/', $path);
+        
         //Remove "/" and "" at begin.
         if(empty(self::$request['args'][0]) || self::$request['args'][0] == '/') {
             array_shift(self::$request['args']);
         }
-
-        //module
-        self::$request['module'] = (empty(self::$request['args'][0]) || self::$request['args'][0] == 'index.php') ? 'System' : array_shift(self::$request['args']);
-        //controller
-        self::$request['controller'] = empty(self::$request['args'][0]) ? 'index' : array_shift(self::$request['args']);
-        //action
-        self::$request['action'] = empty(self::$request['args'][0]) ? 'index' : array_shift(self::$request['args']);
     }
 
     /**
@@ -108,7 +137,8 @@ class Smpe_Mvc_Bootstrap
      * @throws Exception
      */
     private static function initController() {
-        $path = sprintf("%s/Controller/%s/%s.php", self::$workingDir, self::$request['module'], self::$request['controller']);
+        $s = "%s/controller/%s/%s.php";
+        $path = sprintf($s, self::$workingDir, self::$request['module'], self::$request['controller']);
         if(!is_file($path)){
             throw new Exception('Cannot load controller file: '.$path);
         }
@@ -121,28 +151,20 @@ class Smpe_Mvc_Bootstrap
      * @throws Exception
      */
     private static function initAction() {
-        $className = sprintf("Controller_%s_%s", self::$request['module'], self::$request['controller']);
+        $className = sprintf("%s_%s_Controller", self::$request['module'], self::$request['controller']);
         if(!class_exists($className)){
             throw new Exception('Class not exists: '.$className);
         }
 
-        self::$action  = new $className();
+        self::$action  = new $className(self::$request);
 
         if(!method_exists(self::$action, self::$request['action'])){
             throw new Exception('Method not exists: '.$className.'->'.self::$request['action']);
         }
 
-        self::$action->init(self::$workingDir, self::$request);
+        self::$action->init();
 
-        self::$action->load();
-
-        $r = call_user_func_array(array(self::$action, self::$request['action']), self::$request['args']);
-        //if(!isset($r['data']) || !isset($r['msg'])){
-        //    throw new Exception(var_export($r, true));
-        //}
-
-        //self::$action->result($r);
-        return $r;
+        return call_user_func_array(array(self::$action, self::$request['action']), self::$request['args']);
     }
 
     /**
@@ -151,14 +173,15 @@ class Smpe_Mvc_Bootstrap
      */
     private static function autoload($className) {
         $path = str_replace(array('_', '\\'), array('/', '/'), $className);
-        $path = sprintf('%s/Library/%s.php', self::$workingDir, $path);
+        $path = sprintf('%s/library/%s.php', self::$workingDir, $path);
+        
         if(is_file($path)) {
             require $path;
         }
     }
 
     /**
-     * result
+     * Result
      * @param $r
      */
     private static function result($r) {
@@ -195,10 +218,11 @@ class Smpe_Mvc_Bootstrap
             self::initConfig($configPath);
             self::initLog();
             self::initRequest();
+            self::initActionName();
             self::initController();
             $r = self::initAction();
         } catch (Exception $e) {
-            $r = array('data'=>array(), 'msg'=>$e->getMessage());
+            $r = array('data'=>-1, 'msg'=>$e->getMessage());
         }
 
         self::result($r);

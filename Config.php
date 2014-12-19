@@ -2,6 +2,11 @@
 class Config
 {
 	/**
+	 * @var int version
+	 */
+	public static $version = 100;
+
+	/**
 	 * @var number 0:development 1:testing 2:staging 3:production
 	 */
 	public static $environment = 0;
@@ -20,14 +25,14 @@ class Config
 	 * @var array modules
 	 */
 	public static $modules = array(
-		'Support' => array('db'=>'Support'),
+		'Support' => array('db'=>'Support', 'domain'=>''),
 	);
 
 	/**
 	 * @var array DSN
 	 */
 	public static $db = array(
-		'Support' => array('type'=>'Mysql', 'server'=>'localhost', 'port'=>3306, 'user'=>'root', 'password'=>'', 'database'=>'system', 'profiling'=>false),
+		'Support' => array('type'=>'Mysql', 'server'=>'localhost', 'port'=>3306, 'user'=>'root', 'password'=>'', 'database'=>'support', 'profiling'=>false),
 	);
 
 	/**
