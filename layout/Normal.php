@@ -12,6 +12,9 @@
     <script src="<?php echo Smpe_Mvc_Url::pub('/lib/ie/html5shiv.min.js')?>"></script>
     <script src="<?php echo Smpe_Mvc_Url::pub('/lib/ie/respond.min.js')?>"></script>
     <![endif]-->
+    <script src="<?php echo Smpe_Mvc_Url::pub('/src/ie/ie10-viewport-bug-workaround.js')?>"></script>
+    <script src="<?php echo Smpe_Mvc_Url::pub('/src/jquery/jquery.js')?>"></script>
+    <script src="<?php echo Smpe_Mvc_Url::pub('/src/bootstrap/js/bootstrap.js')?>"></script>
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -27,7 +30,7 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="Home"><a href="<?php echo Smpe_Mvc_Url::http()?>">Home</a></li>
+                <li class="menu-Home"><a href="<?php echo Smpe_Mvc_Url::http()?>">Home</a></li>
                 <li class="Help"><a href="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Browse')?>">Documentation</a></li>
                 <li class="About"><a href="<?php echo Smpe_Mvc_Url::http('Support', 'About')?>">About</a></li>
             </ul>
@@ -35,9 +38,6 @@
     </div>
 </nav>
 <?php $this->view();?>
-<script src="<?php echo Smpe_Mvc_Url::pub('/src/jquery/jquery.js')?>"></script>
-<script src="<?php echo Smpe_Mvc_Url::pub('/src/bootstrap/js/bootstrap.js')?>"></script>
-<script src="<?php echo Smpe_Mvc_Url::pub('/src/ie/ie10-viewport-bug-workaround.js')?>"></script>
 <script>
     var c = "<?php echo Smpe_Mvc_Bootstrap::$request['controller']?>"
     switch(c) {
