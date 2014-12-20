@@ -107,6 +107,10 @@ class Smpe_Mvc_Bootstrap
         }
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private static function initActionName() {
         $a = ord(self::$request['action']);
         if($a < 65 || $a > 90) {
@@ -114,6 +118,9 @@ class Smpe_Mvc_Bootstrap
         }
     }
 
+    /**
+     *
+     */
     private static function initArgs() {
         //vDir
         if(Config::$isRewrite){
@@ -137,7 +144,7 @@ class Smpe_Mvc_Bootstrap
      * @throws Exception
      */
     private static function initController() {
-        $s = "%s/controller/%s/%s.php";
+        $s = "%s/controller/%s/%sController.php";
         $path = sprintf($s, self::$workingDir, self::$request['module'], self::$request['controller']);
         if(!is_file($path)){
             throw new Exception('Cannot load controller file: '.$path);
@@ -151,7 +158,7 @@ class Smpe_Mvc_Bootstrap
      * @throws Exception
      */
     private static function initAction() {
-        $className = sprintf("%s_%s_Controller", self::$request['module'], self::$request['controller']);
+        $className = sprintf("%s_%sController", self::$request['module'], self::$request['controller']);
         if(!class_exists($className)){
             throw new Exception('Class not exists: '.$className);
         }
