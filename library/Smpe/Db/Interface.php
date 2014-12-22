@@ -85,13 +85,6 @@ interface Smpe_Db_Interface
     public function count($filter = array(), $group = '', $order = array(), $lock = '');
 
     /**
-     * @param $primaryId
-     * @param int $lock
-     * @return mixed
-     */
-    public function item($primaryId, $lock = 0);
-
-    /**
      * @param $data
      * @return mixed
      */

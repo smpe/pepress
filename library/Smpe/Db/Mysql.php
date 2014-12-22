@@ -232,19 +232,6 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
     }
 
     /**
-     * Read a single line, according to the primary key
-     * @param string $primaryId
-     * @param int $lock
-     * @return array
-     */
-    public function item($primaryId, $lock = 0)
-    {
-        $where = $this->where(array($this->primary => $primaryId), '', false);
-        $result = $this->fetchAll('a.*', $where['join'], $where['where'], $where['param'], 0, 1, array('lock'=>$lock));
-        return (empty($result) ? $result : $result[0]);
-    }
-
-    /**
      * Added (single, multi-line)
      * @param mixed $data
      * @return number

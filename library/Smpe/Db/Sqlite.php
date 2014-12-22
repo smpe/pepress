@@ -113,16 +113,6 @@ class Smpe_Db_Sqlite implements Smpe_Db_Interface
     }
 
     /**
-     * @param $primaryId
-     * @param int $lock
-     * @return mixed
-     */
-    public function item($primaryId, $lock = 0)
-    {
-        // TODO: Implement item() method.
-    }
-
-    /**
      * @param $data
      * @return mixed
      */
