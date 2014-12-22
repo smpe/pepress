@@ -1,10 +1,15 @@
 <link href="<?php echo Smpe_Mvc_Url::pub('/src/showdown/example/showdown-gui.css')?>" rel="stylesheet">
-<form id="form1" name="form1" method="post" action="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'AddSubmit')?>">
+<form id="form1" method="post" action="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'AddSubmit')?>">
+    <div id="pageHeader">
+        <h1><input type="text" id="title" name="title"></h1>
+        <h4><button type="submit" class="btn btn-primary">保存</button></h4>
+    </div>
+
     <div id="leftContainer">
         <div class="paneHeader">
             <span>Input</span>
         </div>
-        <textarea id="inputPane" cols="80" rows="20" class="pane"></textarea>
+        <textarea id="inputPane" name="body" cols="80" rows="20" class="pane"></textarea>
     </div>
 
     <div id="rightContainer">
@@ -32,13 +37,10 @@
 		</span>
         <div id="processingTime" title="Last processing time">0 ms</div>
     </div>
-
-    <div>
-        <button type="submit" class="btn btn-primary">保存</button>
-    </div>
 </form>
 <script src="<?php echo Smpe_Mvc_Url::pub('/src/showdown/showdown.js')?>"></script>
 <script src="<?php echo Smpe_Mvc_Url::pub('/src/showdown/example/showdown-gui.js')?>"></script>
+<script src="<?php echo Smpe_Mvc_Url::pub('/src/jquery/jquery.form.js')?>"></script>
 <script src="<?php echo Smpe_Mvc_Url::pub('/src/jquery-validation/jquery.validate.js')?>"></script>
 <script>
     $(document).ready(function(){
@@ -49,6 +51,9 @@
                     success: function(data, textStatus, jqXHR){
                         if(data == null || typeof data.data == "undefined" || typeof data.msg == "undefined"){
                             return
+                        }
+                        if(data.data <= 0) {
+                            alert(data.msg)
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown){

@@ -26,7 +26,7 @@ class Smpe_Mvc_Url
         } else if(Config::$isRewrite) {
             return sprintf('%s/%s/%s', $url, $module, implode('/', $args));
         } else {
-            return sprintf('%s?p=/%s/%s', $url, $module, implode('/', $args));
+            return sprintf('%s/?p=/%s/%s', $url, $module, implode('/', $args));
         }
     }
 }
