@@ -61,6 +61,15 @@ interface Smpe_Db_Interface
     public function row($filter = array(), $group = '', $order = array(), $lock = 0);
 
     /**
+     * @param array $filter
+     * @param string $group
+     * @param array $order
+     * @param int $lock
+     * @return mixed
+     */
+    public function rowEx($filter = array(), $group = '', $order = array(), $lock = 0);
+
+    /**
      * @param string $column
      * @param array $filter
      * @param string $group

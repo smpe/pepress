@@ -5,6 +5,7 @@ class Support_HelpController extends Smpe_Mvc_Action
      * Add
      */
     public function Add() {
+        $this->response['Title'] = 'Add new help';
         $this->layout();
     }
 
@@ -22,28 +23,24 @@ class Support_HelpController extends Smpe_Mvc_Action
             return $this->failed('Content cannot be empty.');
         }
 
-        $time = date('Y-m-d H:i:s');
-
         $this->beginTransaction();
         try {
             $help = array(
                 'UserID' => 1,
-                'CreationTime' => $time,
-                'UpdateTime' => $time,
+                'CreationTime' => Smpe_Mvc_Bootstrap::$time,
+                'UpdateTime' => Smpe_Mvc_Bootstrap::$time,
                 'Title' => $title,
             );
-
             $helpID = Support_Help::data()->insert($help);
 
             $revision = array(
                 'HelpID' => $helpID,
                 'UserID' => 1,
-                'CreationTime' => $time,
+                'CreationTime' => Smpe_Mvc_Bootstrap::$time,
                 'Status' => '2',
-                'StatusTime' => $time,
+                'StatusTime' => Smpe_Mvc_Bootstrap::$time,
                 'Body' => $body,
             );
-
             Support_HelpRevision::data()->insert($revision);
 
             $this->commit();
@@ -70,7 +67,6 @@ class Support_HelpController extends Smpe_Mvc_Action
             'PageIndex' => Smpe_Mvc_Filter::int('PageIndex', INPUT_GET),
             'PageSize' => 30,
         );
-
         Support_Help::data()->page($this->pagination, $this->data['HelpList'], $this->data['HelpCount']);
 
         $this->response['Title'] = 'Browse help';
@@ -83,13 +79,10 @@ class Support_HelpController extends Smpe_Mvc_Action
      * @return array
      */
     public function Detail($helpID = 0) {
-        $this->data['Help'] = Support_Help::data()->row(array('HelpID'=>$helpID));
-        if(empty($this->data['Help'])) {
-            return $this->failed('Content does not exist.');
-        }
-
+        $this->data['Help'] = Support_Help::data()->rowEx(array('HelpID'=>$helpID));
         $this->data['HelpRevision'] = Support_HelpRevision::data()->row(array('HelpID'=>$helpID));
 
+        $this->response['Title'] = 'View help detail';
         $this->layout();
     }
 
@@ -99,13 +92,10 @@ class Support_HelpController extends Smpe_Mvc_Action
      * @return array
      */
     public function Edit($helpID = 0) {
-        $this->data['Help'] = Support_Help::data()->row(array('HelpID'=>$helpID));
-        if(empty($this->data['Help'])) {
-            return $this->failed('Content does not exist.');
-        }
-
+        $this->data['Help'] = Support_Help::data()->rowEx(array('HelpID'=>$helpID));
         $this->data['HelpRevision'] = Support_HelpRevision::data()->row(array('HelpID'=>$helpID));
 
+        $this->response['Title'] = 'Edit help';
         $this->layout();
     }
 
@@ -113,38 +103,22 @@ class Support_HelpController extends Smpe_Mvc_Action
      * EditSubmit
      */
     public function EditSubmit() {
-        $helpID = Smpe_Mvc_Filter::int('HelpID');
-        if(empty($helpID)) {
-            return $this->failed('HelpID cannot be empty.');
-        }
-        $helpRevisionID = Smpe_Mvc_Filter::int('HelpRevisionID');
-        if(empty($helpRevisionID)) {
-            return $this->failed('HelpRevisionID cannot be empty.');
-        }
-        $title = Smpe_Mvc_Filter::string('Title');
-        if(empty($title)) {
-            return $this->failed('Title cannot be empty.');
-        }
-        $body = Smpe_Mvc_Filter::string('Body');
-        if(empty($body)) {
-            return $this->failed('Content cannot be empty.');
-        }
-
-        $time = date('Y-m-d H:i:s');
+        $helpID = Smpe_Mvc_Filter::intEx('HelpID');
+        $helpRevisionID = Smpe_Mvc_Filter::intEx('HelpRevisionID');
+        $title = Smpe_Mvc_Filter::stringEx('Title');
+        $body = Smpe_Mvc_Filter::stringEx('Body');
 
         $this->beginTransaction();
         try {
             $help = array(
-                'UpdateTime' => $time,
+                'UpdateTime' => Smpe_Mvc_Bootstrap::$time,
                 'Title' => $title,
             );
-
             Support_Help::data()->update($help, array('HelpID'=>$helpID));
 
             $revision = array(
                 'Body' => $body,
             );
-
             Support_HelpRevision::data()->update($revision, array('HelpRevisionID'=>$helpRevisionID));
 
             $this->commit();
@@ -159,6 +133,7 @@ class Support_HelpController extends Smpe_Mvc_Action
      * Index
      */
     public function Index() {
+        $this->response['Title'] = 'Help';
         $this->layout();
     }
 }

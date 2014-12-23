@@ -122,16 +122,6 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
         return $this->query($sql, $parameters)->fetchAll($fetchType);
     }
 
-    private function lockField($lock) {
-        $str = '';
-        switch($lock) {
-            //case 0: $lock = ''; break;
-            case 1: $str = 'FOR UPDATE'; break;
-            case 2: $str = 'LOCK IN SHARE MODE'; break;
-        }
-
-        return $str;
-    }
     /**
      * Read the data, paging, sortable
      * @param array $filter array('user_id' => '2', 'gender' => 'male')
@@ -170,6 +160,23 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
         $where = $this->where($filter, $group, $order);
         $result = $this->fetchAll('a.*', $where['join'], $where['where'], $where['param'], 0, 1, array('lock'=>$lock));
         return (empty($result) ? $result : $result[0]);
+    }
+
+    /**
+     * @param array $filter
+     * @param string $group
+     * @param array $order
+     * @param int $lock
+     * @return array|bool|string
+     * @throws Exception
+     */
+    public function rowEx($filter = array(), $group = '', $order = array(), $lock = 0) {
+        $r = $this->row($filter, $group, $order, $lock);
+        if(empty($r)) {
+            throw new Exception('No data.');
+        } else {
+            return $r;
+        }
     }
 
     /**
@@ -442,6 +449,21 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
         }
 
         return $result;
+    }
+
+    /**
+     * @param $lock
+     * @return string
+     */
+    private function lockField($lock) {
+        $str = '';
+        switch($lock) {
+            //case 0: $lock = ''; break;
+            case 1: $str = 'FOR UPDATE'; break;
+            case 2: $str = 'LOCK IN SHARE MODE'; break;
+        }
+
+        return $str;
     }
 
     /**

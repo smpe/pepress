@@ -8,6 +8,16 @@ class Smpe_Mvc_Bootstrap
     /**
      * @var string
      */
+    public static $time = '';
+
+    /**
+     * @var int
+     */
+    public static $timestamp = 0;
+
+    /**
+     * @var string
+     */
     public static $workingDir = '';
 
     /**
@@ -34,6 +44,8 @@ class Smpe_Mvc_Bootstrap
      */
     private static function initWorkingDir($p) {
         self::$workingDir = $p;
+        self::$time = date('Y-m-d H:i:s');
+        self::$timestamp = time();
     }
 
     /**
