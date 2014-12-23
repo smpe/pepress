@@ -1,4 +1,8 @@
 <?php
+// Copyright 2015 The Smpe Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 //define('REQUEST_TIME', microtime(true));
 mb_internal_encoding('utf-8');
 header("Content-type: text/html; charset=UTF-8");

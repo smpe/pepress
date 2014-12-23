@@ -1,3 +1,8 @@
+<?php
+// Copyright 2015 The Smpe Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+?>
 <div>
     <a class="btn btn-default" href="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Browse')?>" role="button">Browse</a>
     <a class="btn btn-default" href="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Edit', $this->data['Help']['HelpID'])?>" role="button">Edit</a>
