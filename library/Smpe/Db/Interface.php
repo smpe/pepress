@@ -45,16 +45,11 @@ interface Smpe_Db_Interface
     public function all($filter = array(), $group = '', $order = array(), $pageIndex = 0, $pageSize = 10000, $lock = 0);
 
     /**
-     * @param string $column
-     * @param array $filter
-     * @param string $group
-     * @param array $order
-     * @param int $pageIndex
-     * @param int $pageSize
-     * @param int $lock
-     * @return mixed
+     * @param $arr
+     * @param $data
+     * @param $count
      */
-    public function lst($column = 'a.*', $filter = array(), $group = '', $order = array(), $pageIndex = 0, $pageSize = 10000, $lock = 0);
+    public function page($arr, &$data, &$count);
 
     /**
      * @param array $filter
@@ -73,16 +68,26 @@ interface Smpe_Db_Interface
      * @param int $lock
      * @return mixed
      */
-    public function val($column = 'COUNT(*)', $filter = array(), $group = '', $order = array(), $lock = 0);
+    public function value($column, $filter = array(), $group = '', $order = array(), $lock = 0);
+
+    /**
+     * @param string $column
+     * @param array $filter
+     * @param string $group
+     * @param array $order
+     * @param int $lock
+     * @return array()
+     */
+    public function total($column, $filter = array(), $group = '', $order = array(), $lock = 0);
 
     /**
      * @param array $filter
      * @param string $group
      * @param array $order
-     * @param string $lock
+     * @param int $lock
      * @return mixed
      */
-    public function count($filter = array(), $group = '', $order = array(), $lock = '');
+    public function count($filter = array(), $group = '', $order = array(), $lock = 0);
 
     /**
      * @param $data

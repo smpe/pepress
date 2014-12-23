@@ -36,15 +36,12 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @return mixed
      * @throws Exception
      */
-    public static function db($module)
-    {
+    public static function db($module) {
         //Allows multiple modules to use the same database
-        $dataIndex = config::$modules[$module]['data'];
-
+        $dataIndex = config::$modules[$module]['dsn'];
         if(empty(self::$db[$dataIndex])){
-            $db = config::$db[$dataIndex];
+            $db = config::$dsn[$dataIndex];
             $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;', $db['server'], $db['port'], $db['database']);
-
             $options = array(
                 PDO::ATTR_PERSISTENT => true,
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
@@ -55,10 +52,6 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
                 //PDO::ATTR_EMULATE_PREPARES => 1
                 self::$db[$dataIndex] = new PDO($dsn, $db['user'], $db['password'], $options);
                 self::$db[$dataIndex]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                //Setting UTF-8 encoding, using GMT / UTC time zone
-                //self::$db[$dataIndex]->exec("SET TIME_ZONE = '+00:00'");
-
                 if($db['profiling']){ //profiling
                     self::$db[$dataIndex]->exec("SET profiling = 1");
                 }
@@ -74,12 +67,13 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param $module
      * @param $table
      * @param $primary
+     * @param $joins
      */
-    public function __construct($module, $table, $primary)
-    {
+    public function __construct($module, $table, $primary, $joins = array()) {
         $this->module  = $module;
-        $this->table   = strtolower($module) . '_' . $table;
+        $this->table   = $table;
         $this->primary = $primary;
+        $this->joins   = $joins;
     }
 
     /**
@@ -87,8 +81,7 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param string $value
      * @return string
      */
-    public function quote($value)
-    {
+    public function quote($value) {
         return self::db($this->module)->quote($value);
     }
 
@@ -99,24 +92,14 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @return PDOStatement
      * @throws Exception
      */
-    public function query($sql, $parameters = array())
-    {
+    public function query($sql, $parameters = array()) {
         self::$queries++;
-
-        /*if(config::$db[config::$modules[$this->module]['data']]['profiling']){ //记录日志
-            error_log(
-                date('Y-m-d H:i:s').': '.$sql."\r\n".var_export($parameters, true)."\r\n\r\n",
-                3,
-                PROJECT_ROOT.'/log/err/mysql_'.monle_date_utc::today().'.log'
-            );
-        }*/
 
         try {
             $statement = self::db($this->module)->prepare($sql);
             $statement->execute($parameters);
             return $statement;
         } catch (PDOException $e) {
-            //trigger_error($e->getMessage()."\r\n".$e->getTraceAsString()."\r\n".$sql."\r\n".var_export($parameters, true));
             throw new Exception($e->getMessage());
         }
     }
@@ -132,19 +115,23 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param array $opts
      * @return array|bool|string
      */
-    public function fetchAll($fields = 'a.*', $join = '', $where = '1', $parameters = array(), $pageIndex = 0, $pageSize = 10000, $opts = array())
-    {
-        $lock = empty($opts['lock']) ? '' : $opts['lock'];
-        switch($lock) {
-            case 0: $lock = ''; break;
-            case 1: $lock = 'FOR UPDATE'; break;
-            case 2: $lock = 'LOCK IN SHARE MODE'; break;
-        }
+    public function fetchAll($fields = 'a.*', $join = '', $where = '1', $parameters = array(), $pageIndex = 0, $pageSize = 10000, $opts = array()) {
+        $lock = $this->lockField((empty($opts['lock']) ? '' : $opts['lock']));
         $fetchType = empty($opts['fetch_type']) ? PDO::FETCH_ASSOC : $opts['fetch_type'];
         $sql = sprintf("SELECT %s FROM `%s` a %s WHERE %s LIMIT %d, %d %s", $fields, $this->table, $join, $where, $pageIndex, $pageSize, $lock);
         return $this->query($sql, $parameters)->fetchAll($fetchType);
     }
 
+    private function lockField($lock) {
+        $str = '';
+        switch($lock) {
+            //case 0: $lock = ''; break;
+            case 1: $str = 'FOR UPDATE'; break;
+            case 2: $str = 'LOCK IN SHARE MODE'; break;
+        }
+
+        return $str;
+    }
     /**
      * Read the data, paging, sortable
      * @param array $filter array('user_id' => '2', 'gender' => 'male')
@@ -155,27 +142,20 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param int $lock
      * @return array|bool|string
      */
-    public function all($filter = array(), $group = '', $order = array(), $pageIndex = 0, $pageSize = 10000, $lock = 0)
-    {
+    public function all($filter = array(), $group = '', $order = array(), $pageIndex = 0, $pageSize = 10000, $lock = 0) {
         $where = $this->where($filter, $group, $order);
         return $this->fetchAll('a.*', $where['join'], $where['where'], $where['param'], $pageIndex, $pageSize, array('lock'=>$lock));
     }
 
     /**
-     * Read the data, paging, sortable
-     * @param string $column
-     * @param array $filter array('user_id' => '2', 'gender' => 'male')
-     * @param string $group
-     * @param array $order array('a.user_id' => '0', 'b.gender' => '1')
-     * @param int $pageIndex
-     * @param int $pageSize
-     * @param int $lock
-     * @return array|bool|string
+     *
+     * @param $arr
+     * @param $data
+     * @param $count
      */
-    public function lst($column = 'a.*', $filter = array(), $group = '', $order = array(), $pageIndex = 0, $pageSize = 10000, $lock = 0)
-    {
-        $where = $this->where($filter, $group, $order);
-        return $this->fetchAll($column, $where['join'], $where['where'], $where['param'], $pageIndex, $pageSize, array('lock'=>$lock));
+    public function page($arr, &$data, &$count) {
+        $data  = $this->all($arr['Where'], $arr['Group'], $arr['Order'], $arr['PageIndex'], $arr['PageSize']);
+        $count = $this->count($arr['Where'], $arr['Group'], $arr['Order']);
     }
 
     /**
@@ -186,8 +166,7 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param int $lock
      * @return array|bool|string
      */
-    public function row($filter = array(), $group = '', $order = array(), $lock = 0)
-    {
+    public function row($filter = array(), $group = '', $order = array(), $lock = 0) {
         $where = $this->where($filter, $group, $order);
         $result = $this->fetchAll('a.*', $where['join'], $where['where'], $where['param'], 0, 1, array('lock'=>$lock));
         return (empty($result) ? $result : $result[0]);
@@ -201,11 +180,27 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param int $lock
      * @return string
      */
-    public function val($column = 'COUNT(*)', $filter = array(), $group = '', $order = array(), $lock = 0)
-    {
+    public function value($column, $filter = array(), $group = '', $order = array(), $lock = 0) {
         $where = $this->where($filter, $group, $order);
-        $result = $this->fetchAll($column, $where['join'], $where['where'], $where['param'], 0, 1, array('lock'=>$lock, 'fetch_type'=>PDO::FETCH_NUM));
-        return (empty($result) ? '' : $result[0][0]);
+        $result = $this->fetchAll($column, $where['join'], $where['where'], $where['param'], 0, 1, array('lock'=>$lock));
+        return (empty($result) ? '' : $result[0]);
+    }
+
+    /**
+     * Total read row, sortable
+     * @param string $column
+     * @param array $filter array('user_id' => '2', 'gender' => 'male')
+     * @param string $group
+     * @param array $order array('a.user_id' => '0', 'b.gender' => '1')
+     * @param int $lock
+     * @return array()
+     */
+    public function total($column, $filter = array(), $group = '', $order = array(), $lock = 0) {
+        $sql = "SELECT %s FROM (SELECT 1 FROM `%s` a %s WHERE %s %s) z";
+        $where = $this->where($filter, $group, $order);
+        $sql = sprintf($sql, $column, $this->table, $where['join'], $where['where'], $this->lockField($lock));
+        $result = $this->query($sql, $where['param'])->fetchAll(PDO::FETCH_ASSOC);
+        return (empty($result) ? 0 : $result[0]);
     }
 
     /**
@@ -213,22 +208,15 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param array $filter array('user_id' => '2', 'gender' => 'male')
      * @param string $group
      * @param array $order array('a.user_id' => '0', 'b.gender' => '1')
-     * @param string $lock Empty, FOR UPDATE , LOCK IN SHARE MODE
+     * @param int $lock
      * @return int
      */
-    public function count($filter = array(), $group = '', $order = array(), $lock = '')
-    {
-        if(empty($group)){
-            $count = $this->val('COUNT(*)', $filter, $group, $order, $lock);
-            return (int)$count;
-        }
-        else{
-            //TODO: 含用group by的条件的行数计算, 暂时拷贝fetchAll()方法
-            $where = $this->where($filter, $group, $order);
-            $sql = sprintf("SELECT COUNT(*) FROM (SELECT 1 FROM `%s` a %s WHERE %s %s) b", $this->table, $where['join'], $where['where'], $lock);
-            $result = $this->query($sql, $where['param'])->fetchAll(PDO::FETCH_NUM);
-            return (empty($result) ? 0 : (int)$result[0][0]);
-        }
+    public function count($filter = array(), $group = '', $order = array(), $lock = 0) {
+        $sql = "SELECT COUNT(*) FROM (SELECT 1 FROM `%s` a %s WHERE %s %s) z";
+        $where = $this->where($filter, $group, $order);
+        $sql = sprintf($sql, $this->table, $where['join'], $where['where'], $this->lockField($lock));
+        $result = $this->query($sql, $where['param'])->fetchAll(PDO::FETCH_NUM);
+        return (empty($result) ? 0 : (int)$result[0][0]);
     }
 
     /**
@@ -236,8 +224,7 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param mixed $data
      * @return number
      */
-    public function insert($data)
-    {
+    public function insert($data) {
         if(empty($data)) {
             return 0;
         }
@@ -246,13 +233,14 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
             $data = array($data); //Support insert multiple rows
         }
 
-        $sql = sprintf('INSERT INTO `%s`(`%s`) VALUES %s', $this->table, implode('`,`', array_keys($data[0])), $this->insertFields($data));
+        $sql = 'INSERT INTO `%s`(`%s`) VALUES %s';
+        $sql = sprintf($sql, $this->table, implode('`,`', array_keys($data[0])), $this->insertFields($data));
 
         if($this->query($sql)->rowCount() > 0){
             return self::db($this->module)->lastInsertId();
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
     /**
@@ -261,8 +249,7 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param mixed $filter
      * @return number
      */
-    public function update($data, $filter)
-    {
+    public function update($data, $filter) {
         $where = $this->where($filter, '', false);
         $sql = sprintf('UPDATE `%s` SET %s WHERE %s', $this->table, $this->updateFields($data), $where['where']);
         return $this->query($sql, $where['param'])->rowCount();
@@ -273,8 +260,7 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param mixed $filter
      * @return number
      */
-    public function delete($filter)
-    {
+    public function delete($filter) {
         $where = $this->where($filter, '', false);
         $sql = sprintf('DELETE FROM `%s` WHERE %s', $this->table, $where['where']);
         return $this->query($sql, $where['param'])->rowCount();
@@ -287,8 +273,7 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param array $order
      * @return array
      */
-    private function where($filter, $group = '', $order = array())
-    {
+    private function where($filter, $group = '', $order = array()) {
         $result = array('join_tables' => array(), 'join' => '', 'where' => ' 1 ', 'param' => array());
 
         /*
@@ -340,27 +325,28 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
         // array('id'=>'asc','str'=>'desc'): Specify the sort
         if(is_array($order)){
             $result['where'] .= ' ORDER BY ';
-
             if(count($order) > 0){
                 foreach($order as $key => $value){
+                    if(!in_array($value, array('asc', 'desc'))) {
+                        continue; //Security
+                    }
+
                     //将形如a.user_id拆分为$tableAlias和$field
                     $fields = explode('.', $key);
                     if(count($fields) == 1){
                         $tableAlias = 'a';
                         $field = $fields[0];
-                    }
-                    else{
+                    } else {
                         $tableAlias = $fields[0];
                         $field = $fields[1];
                     }
 
                     $keys = $this->quoteField($tableAlias, $field, $result['param']);
-                    $result['where'] .= $keys['field'].' '.self::$orderBy[$value].' ,';
+                    $result['where'] .= $keys['field'].' '.strtoupper($value).' ,';
                 }
 
                 $result['where'] = rtrim($result['where'], ',');
-            }
-            else{
+            } else {
                 $result['where'] .= ' a.'.$this->primary.' DESC ';
             }
         }
@@ -373,8 +359,7 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param array $result
      * @param array $item
      */
-    private function whereItem(&$result, $item)
-    {
+    private function whereItem(&$result, $item) {
         //personal_message, money_transaction中有复合查询的应用例子
 
         /*
@@ -447,13 +432,11 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param $params
      * @return array
      */
-    private function quoteField($tableAlias, $field, $params)
-    {
+    private function quoteField($tableAlias, $field, $params) {
         //当$tableAlias为空值时, 忽略掉
         $fullField = empty($tableAlias) ? '`'.$field.'`' : $tableAlias.'.`'.$field.'`';
 
         $result = array('field'=>$fullField, 'param'=>$field);
-
         if(isset($params[$result['param']])){ //避免重复
             $result['param'] = $result['param'].'_'.rand(10000, 99999);
         }
@@ -466,10 +449,8 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param $values
      * @return string
      */
-    private function updateFields($values)
-    {
+    private function updateFields($values) {
         $fields = '';
-
         foreach ($values as $key => $value) {
             $fields .= sprintf(',`%s` = %s', $key, $this->quote($value));
         }
@@ -482,13 +463,10 @@ class Smpe_Db_Mysql implements Smpe_Db_Interface
      * @param $values
      * @return string
      */
-    private function insertFields($values)
-    {
+    private function insertFields($values) {
         $sql = '';
-
         foreach ($values as $value) {
             $a = '';
-
             foreach ($value as $v) {
                 $a .= sprintf('%s,', $this->quote($v));
             }

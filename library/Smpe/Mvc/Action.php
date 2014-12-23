@@ -9,16 +9,26 @@ class Smpe_Mvc_Action
     /**
      * @var array Response
      */
-    protected $reponse = array(
-        'title'       =>'',
-        'description' =>'',
-        'layout'      =>'', //empty default
+    protected $response = array(
+        'Title'       =>'',
+        'Description' =>'',
+        'Layout'      =>'', //empty default
     );
 
     /**
      * @var array
      */
     protected $data = array();
+
+    /**
+     * @var array
+     */
+    protected $pagination = array();
+
+    /**
+     * @var array
+     */
+    protected $error = array();
 
     /**
      * constructor
@@ -43,8 +53,8 @@ class Smpe_Mvc_Action
      * @param array $data
      */
     public function error($msg = '', $data = array()) {
-        $this->data['msg'] = $msg;
-        $this->data['data'] = $data;
+        $this->error['msg'] = $msg;
+        $this->error['data'] = $data;
         $this->layout('Error');
     }
 
@@ -81,11 +91,12 @@ class Smpe_Mvc_Action
             $htmlPath = sprintf('%s/view/%s/%s_%s.php', Smpe_Mvc_Bootstrap::$workingDir, $this->request['module'], $this->request['controller'], $this->request['action']);
         }
 
-        if(!is_file($htmlPath)){
-            throw new Exception('Cannot load view file: '.$htmlPath);
+        if(is_file($htmlPath)){
+            include $htmlPath;
+        } else {
+            echo 'Cannot load view file: '.$htmlPath;
+            //throw new Exception('Cannot load view file: '.$htmlPath);
         }
-
-        include $htmlPath;
     }
 
     /**
@@ -155,11 +166,15 @@ class Smpe_Mvc_Action
             $moduleName = $this->request['module'];
         }
 
-        if(!isset(Config::$modules[$moduleName]['db']['type'])){
+        if(!isset(Config::$modules[$moduleName]['dsn']) || !isset(Config::$dsn[Config::$modules[$moduleName]['dsn']])){
+            throw new Exception('Module DB error.');
+        }
+
+        if(!isset(Config::$dsn[Config::$modules[$moduleName]['dsn']]['type'])){
             throw new Exception('Module DB type error.');
         }
 
-        $obj = array('Smpe_Db_'.Config::$modules[$moduleName]['db']['type'], 'db');
+        $obj = array('Smpe_Db_'.Config::$dsn[Config::$modules[$moduleName]['dsn']]['type'], 'db');
         return call_user_func_array($obj, array($moduleName));
     }
 }

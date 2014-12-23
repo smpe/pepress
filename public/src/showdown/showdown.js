@@ -1134,7 +1134,7 @@ var _DoItalicsAndBold = function(text) {
 		"<strong>$2</strong>");
 
 	text = text.replace(/(^| )(\*|_)(?=\S)([^\r]*?\S)\2($| )/g,
-		"<em>$2</em>");
+		"<em>$3</em>");
 
 	return text;
 }

@@ -12,7 +12,13 @@ class Support_Help
     public static function data()
     {
         if(is_null(self::$data)){
-            self::$data = new Smpe_Db_Mysql('Support', 'help', 'HelpID');
+            // The definition of the associated table
+            $joins = array(
+                'b' => ' INNER JOIN help_revision b ON b.HelpID = a.HelpID ',
+            );
+
+            // Data Access Objects
+            self::$data = new Smpe_Db_Mysql('Support', 'help', 'HelpID', $joins);
         }
 
         return self::$data;

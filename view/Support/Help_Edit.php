@@ -1,10 +1,13 @@
 <link href="<?php echo Smpe_Mvc_Url::pub('/src/showdown/example/showdown-gui.css')?>" rel="stylesheet">
 <div>
     <a class="btn btn-default" href="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Browse')?>" role="button">Browse</a>
+    <a class="btn btn-default" href="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Detail', $this->data['Help']['HelpID'])?>" role="button">View</a>
 </div>
-<form id="form1" method="post" action="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'AddSubmit')?>">
+<form id="form1" method="post" action="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'EditSubmit')?>">
+    <input type="hidden" id="HelpID" name="HelpID" value="<?php echo $this->data['Help']['HelpID']?>">
+    <input type="hidden" id="HelpRevisionID" name="HelpRevisionID" value="<?php echo $this->data['HelpRevision']['HelpRevisionID']?>">
     <div id="pageHeader">
-        <h1><input type="text" id="Title" name="Title"><button type="submit" class="btn btn-primary">Save</button></h1>
+        <h1><input type="text" id="Title" name="Title" value="<?php echo $this->data['Help']['Title']?>"><button type="submit" class="btn btn-primary">Save</button></h1>
         <h4></h4>
     </div>
 
@@ -12,7 +15,7 @@
         <div class="paneHeader">
             <span>Input</span>
         </div>
-        <textarea id="inputPane" name="Body" cols="80" rows="20" class="pane"></textarea>
+        <textarea id="inputPane" name="Body" cols="80" rows="20" class="pane"><?php echo $this->data['HelpRevision']['Body']?></textarea>
     </div>
 
     <div id="rightContainer">
@@ -29,7 +32,7 @@
     </div>
 
     <div id="footer">
-		<span id="byline"></span>
+        <span id="byline"></span>
 		<span id="convertTextControls">
 			<button id="convertTextButton" type="button" title="Convert text now">Convert text</button>
 			<select id="convertTextSetting">
@@ -58,7 +61,7 @@
                         if(data.data <= 0) {
                             alert(data.msg)
                         } else {
-                            window.location = "<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Detail')?>/"+data.data
+                            window.location = "<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Detail', $this->data['Help']['HelpID'])?>"
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown){

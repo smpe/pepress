@@ -31,8 +31,8 @@
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="menu-Home"><a href="<?php echo Smpe_Mvc_Url::http()?>">Home</a></li>
-                <li class="Help"><a href="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Browse')?>">Documentation</a></li>
-                <li class="About"><a href="<?php echo Smpe_Mvc_Url::http('Support', 'About')?>">About</a></li>
+                <li class="menu-Help"><a href="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Browse')?>">Documentation</a></li>
+                <li class="menu-About"><a href="<?php echo Smpe_Mvc_Url::http('Support', 'About')?>">About</a></li>
             </ul>
         </div>
     </div>
@@ -45,7 +45,7 @@
         case "About": c = "About"; break
         default: c = "Home"; break
     }
-    $("."+c).addClass("active")
+    $(".menu-"+c).addClass("active")
 </script>
 </body>
 </html>

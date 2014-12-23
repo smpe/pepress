@@ -46,32 +46,6 @@ class Smpe_Mvc_Filter
     }
 
     /**
-     * Gets a specific external variable by name and optionally filters it (Unsafe)
-     * @param string $queryName
-     * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
-     * @return string
-     */
-    public static function html($queryName, $type = INPUT_POST)
-    {
-        $returnValue = filter_input($type, $queryName, FILTER_UNSAFE_RAW, array('flags' => FILTER_NULL_ON_FAILURE));
-
-        return strip_tags($returnValue, '<a><b><br><center><code><dd><div><dl><dt><em><font><h1><h2><h3><h4><h5><h6><hr><i><img><label><li><ol><p><pre><span><strike><strong><table><tbody><td><tfoot><th><thead><tr><u><ul>' );
-    }
-
-    /**
-     * Gets a specific external variable by name and optionally filters it (Unsafe)
-     * @param string $queryName
-     * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
-     * @return string
-     */
-    public static function htmlStrict($queryName, $type = INPUT_POST)
-    {
-        $returnValue = filter_input($type, $queryName, FILTER_UNSAFE_RAW, array('flags' => FILTER_NULL_ON_FAILURE));
-
-        return strip_tags($returnValue, '<b><br><center><code><dd><div><dl><dt><em><font><h1><h2><h3><h4><h5><h6><hr><i><img><label><li><ol><p><pre><span><strike><strong><table><tbody><td><tfoot><th><thead><tr><u><ul>' );
-    }
-
-    /**
      * Gets a specific external variable by name and optionally filters it
      * @param $queryName
      * @param int $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV
@@ -90,18 +64,15 @@ class Smpe_Mvc_Filter
      */
     public static function order($queryName = 'order', $type = INPUT_GET)
     {
-        //user_id-0|nickname-1|latest_login_time-1
+        //a.UserID-asc:b.CreationTime-desc
         $orderStr = self::string($queryName, $type);
-
         if(empty($orderStr)){
             return array();
         }
 
         $result = array();
-
-        $order = explode('--', $orderStr);
-
-        foreach ($order as $key => $value) {
+        $orders = explode(':', $orderStr);
+        foreach ($orders as $key => $value) {
             $item = explode('-', $value);
             $result[$item[0]] = $item[1];
         }

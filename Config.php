@@ -25,13 +25,13 @@ class Config
 	 * @var array modules
 	 */
 	public static $modules = array(
-		'Support' => array('db'=>'Support', 'domain'=>''),
+		'Support' => array('dsn'=>'Support', 'domain'=>''),
 	);
 
 	/**
 	 * @var array DSN
 	 */
-	public static $db = array(
+	public static $dsn = array(
 		'Support' => array('type'=>'Mysql', 'server'=>'localhost', 'port'=>3306, 'user'=>'root', 'password'=>'', 'database'=>'support', 'profiling'=>false),
 	);
 
