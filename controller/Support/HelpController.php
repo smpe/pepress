@@ -91,6 +91,25 @@ class Support_HelpController extends Smpe_Mvc_Action
     }
 
     /**
+     * DeleteSubmit
+     */
+    public function DeleteSubmit() {
+        $helpID = Smpe_Mvc_Filter::intEx('HelpID');
+
+        $this->beginTransaction();
+        try {
+            $aRow = Support_Help::data()->delete(array('HelpID'=>$helpID));
+            Support_HelpRevision::data()->delete(array('HelpID'=>$helpID));
+
+            $this->commit();
+            return $this->succeed($aRow);
+        } catch(Exception $e) {
+            $this->rollBack();
+            return $this->failed($e->getMessage());
+        }
+    }
+
+    /**
      * Edit
      * @param int $helpID
      * @return array

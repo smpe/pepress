@@ -41,15 +41,27 @@ class Smpe_Mvc_Url
      * @return string
      */
     private static function fullUrl($schema, $args) {
-        $module = empty($args) ? Config::$defaultModule : array_shift($args);
-        $domain = empty(Config::$modules[$module]['listen']) ? Smpe_Mvc_Bootstrap::$request['host'] : Config::$modules[$module]['listen'];
-        $url = sprintf("%s://%s%s", $schema, $domain, Config::$vDir);
-        if(empty($args)) {
-            return $url;
-        } else if(Config::$isRewrite) {
-            return sprintf('%s/%s/%s', $url, $module, implode('/', $args));
-        } else {
-            return sprintf('%s/?p=/%s/%s', $url, $module, implode('/', $args));
+        if(Config::$isRewrite) {
+            return self::fullUrlRwrite($schema, $args);
         }
+
+        if(empty($args)) {
+            return Config::$vDir;
+        }
+
+        $module = array_shift($args);
+        return sprintf('%s?p=/%s/%s', Config::$vDir, $module, implode('/', $args));
+    }
+
+    /**
+     * @param $schema
+     * @param $args
+     * @return string
+     */
+    private static function fullUrlRwrite($schema, $args) {
+        $module = empty($args) ? Config::$defaultModule : array_shift($args);
+        $domain = Config::$modules[$module]['listen'];
+        $url = sprintf("%s://%s%s", $schema, $domain, Config::$vDir);
+        return sprintf('%s%s/%s', $url, $module, implode('/', $args));
     }
 }

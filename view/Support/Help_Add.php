@@ -3,55 +3,73 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 ?>
-<link href="<?php echo Smpe_Mvc_Url::pub('/src/showdown/example/showdown-gui.css')?>" rel="stylesheet">
-<div>
-    <a class="btn btn-default" href="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Browse')?>" role="button">Browse</a>
-</div>
-<form id="form1" method="post" action="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'AddSubmit')?>">
-    <div id="pageHeader">
-        <h1><input type="text" id="Title" name="Title"><button type="submit" class="btn btn-primary">Save</button></h1>
-        <h4></h4>
+
+<div class="container">
+    <div>
+        <a class="btn btn-default" href="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Browse')?>" role="button">Browse</a>
     </div>
 
-    <div id="leftContainer">
-        <div class="paneHeader">
-            <span>Input</span>
+    <form id="form1" method="post" action="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'AddSubmit')?>">
+        <div class="form-group">
+            <label for="Title">Title</label>
+            <input type="email" class="form-control" id="Title" name="Title" placeholder="Title">
         </div>
-        <textarea id="inputPane" name="Body" cols="80" rows="20" class="pane"></textarea>
-    </div>
 
-    <div id="rightContainer">
-        <div class="paneHeader">
-            <select id="paneSetting">
-                <option value="previewPane">Preview</option>
-                <option value="outputPane">HTML Output</option>
-                <option value="syntaxPane">Syntax Guide</option>
-            </select>
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label for="Body">Body</label>
+                    <textarea id="Body" name="Body" cols="80" rows="20" class="form-control"></textarea>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label for="previewPanel">Preview</label>
+                    <div id="previewPanel" class="form-control"></div>
+                </div>
+            </div>
         </div>
-        <textarea id="outputPane" class="pane" cols="80" rows="20" readonly="readonly"></textarea>
-        <div id="previewPane" class="pane"><noscript><h2>You'll need to enable Javascript to use this tool.</h2></noscript></div>
-        <textarea id="syntaxPane" class="pane" cols="80" rows="20" readonly="readonly"></textarea>
-    </div>
 
-    <div id="footer">
-		<span id="byline"></span>
-		<span id="convertTextControls">
-			<button id="convertTextButton" type="button" title="Convert text now">Convert text</button>
-			<select id="convertTextSetting">
-                <option value="delayed">in the background</option>
-                <option value="continuous">every keystroke</option>
-                <option value="manual">manually</option>
-            </select>
-		</span>
         <div id="processingTime" title="Last processing time">0 ms</div>
-    </div>
-</form>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+</div>
+
 <script src="<?php echo Smpe_Mvc_Url::pub('/src/showdown/showdown.js')?>"></script>
-<script src="<?php echo Smpe_Mvc_Url::pub('/src/showdown/example/showdown-gui.js')?>"></script>
 <script src="<?php echo Smpe_Mvc_Url::pub('/src/jquery/jquery.form.js')?>"></script>
 <script src="<?php echo Smpe_Mvc_Url::pub('/src/jquery-validation/jquery.validate.js')?>"></script>
 <script>
+    // build the converter
+    var converter = new Showdown.converter();
+
+    function convert() {
+        $("#Body").css("height", "auto")
+        $("#previewPanel").css("height", "auto")
+
+        var startTime = new Date().getTime()
+
+        // Do the conversion
+        $("#previewPanel").html(converter.makeHtml($("#Body").val()))
+
+        // display processing time
+        var endTime = new Date().getTime();
+        var processingTime = endTime - startTime;
+        $("#processingTime").html(processingTime+" ms")
+
+        var bh = $("#Body").height()
+        var ph = $("#previewPanel").height()
+        if(bh > ph) {
+            $("#previewPanel").height(bh)
+        } else {
+            $("#Body").height(ph)
+        }
+    }
+
     $(document).ready(function(){
+        $("#Body").keyup(function(event){
+            convert()
+        })
+
         $("#form1").validate({
             submitHandler: function(form){
                 $(form).ajaxSubmit({
@@ -71,5 +89,7 @@
                 })
             }
         })
+
+        convert()
     })
 </script>

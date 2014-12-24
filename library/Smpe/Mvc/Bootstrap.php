@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//define('REQUEST_TIME', microtime(true));
+//define('REQUEST_TIME_FLOAT', microtime(true));
 mb_internal_encoding('utf-8');
 header("Content-type: text/html; charset=UTF-8");
 
@@ -143,6 +143,7 @@ class Smpe_Mvc_Bootstrap
             $path = parse_url(Smpe_Mvc_Filter::string('REQUEST_URI', INPUT_SERVER), PHP_URL_PATH);
             $path = substr($path, strlen(config::$vDir));
         } else {
+            config::$vDir = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
             $path = Smpe_Mvc_Filter::string('p', INPUT_GET);
         }
         
@@ -200,6 +201,9 @@ class Smpe_Mvc_Bootstrap
         
         if(is_file($path)) {
             require $path;
+        } else {
+            $m = 'File not exists: '.$path."\n";
+            file_put_contents(self::$workingDir.'/data/log/smpe.log', $m, FILE_APPEND|LOCK_EX);
         }
     }
 
@@ -208,17 +212,17 @@ class Smpe_Mvc_Bootstrap
      * @param $r
      */
     private static function result($r) {
+        if(is_null(self::$action)){
+            var_dump($r);
+            return;
+        }
+
         if(is_null($r)) {
             return;
         }
 
         if(!is_array($r)){
             $r = array('data'=>$r, 'msg'=>'');
-        }
-
-        if(is_null(self::$action)){
-            echo $r['msg'];
-            return;
         }
 
         if($_SERVER["REQUEST_METHOD"] == 'POST') {
@@ -249,5 +253,22 @@ class Smpe_Mvc_Bootstrap
         }
 
         self::result($r);
+
+        if(Config::$environment < 2) {
+            $t = number_format(microtime(true)-$_SERVER['REQUEST_TIME_FLOAT'], 4, '.', '');
+            $m = sprintf("%s: Consuming time %ss (%s)\n", self::$time, $t, $_SERVER['REQUEST_URI']);
+            //error_log($m, 3, self::$workingDir.'/data/log/smpe.log'); //Conflict
+            file_put_contents(self::$workingDir.'/data/log/smpe.log', $m, FILE_APPEND|LOCK_EX);
+        }
+    }
+
+    /**
+     * Write log message.
+     * @param string $message
+     * @param string $scope
+     * @param array $options
+     */
+    public static function log($message, $scope = 'smpe', $options = array()) {
+
     }
 }

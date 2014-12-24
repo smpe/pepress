@@ -3,22 +3,17 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-class Config
+class Config extends Smpe_Mvc_Config
 {
 	/**
 	 * @var int version
 	 */
-	public static $version = 100;
+	public static $version = 1;
 
 	/**
 	 * @var number 0:development 1:testing 2:staging 3:production
 	 */
 	public static $environment = 0;
-
-	/**
-	 * @var string Virtual directory.
-	 */
-	public static $vDir = '/pepress/public';
 
 	/**
 	 * @var bool url rewrite.
@@ -29,7 +24,7 @@ class Config
 	 * @var array modules
 	 */
 	public static $modules = array(
-		'Support' => array('dsn'=>'Support', 'domain'=>''),
+		'Support' => array('dsn'=>'Support', 'listen'=>''),
 	);
 
 	/**
