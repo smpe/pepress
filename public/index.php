@@ -4,5 +4,5 @@
 // license that can be found in the LICENSE file.
 
 $workingDir = realpath(dirname(__FILE__) . '/../');
-require $workingDir . '/library/Smpe/Mvc/Bootstrap.php';
-Smpe_Mvc_Bootstrap::run($workingDir);
+require $workingDir . '/library/Smpe/Bootstrap.php';
+Smpe_Bootstrap::run($workingDir);

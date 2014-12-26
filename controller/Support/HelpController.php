@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-class Support_HelpController extends Smpe_Mvc_Action
+class Support_HelpController extends Smpe_Action
 {
     /**
      * Add
@@ -18,11 +18,11 @@ class Support_HelpController extends Smpe_Mvc_Action
      * @return array
      */
     public function AddSubmit() {
-        $title = Smpe_Mvc_Filter::string('Title');
+        $title = Smpe_InputFilter::string('Title');
         if(empty($title)) {
             return $this->failed('Title cannot be empty.');
         }
-        $body = Smpe_Mvc_Filter::string('Body');
+        $body = Smpe_InputFilter::string('Body');
         if(empty($body)) {
             return $this->failed('Content cannot be empty.');
         }
@@ -31,8 +31,8 @@ class Support_HelpController extends Smpe_Mvc_Action
         try {
             $help = array(
                 'UserID' => 1,
-                'CreationTime' => Smpe_Mvc_Bootstrap::$time,
-                'UpdateTime' => Smpe_Mvc_Bootstrap::$time,
+                'CreationTime' => Smpe_Bootstrap::$time,
+                'UpdateTime' => Smpe_Bootstrap::$time,
                 'Title' => $title,
             );
             $helpID = Support_Help::data()->insert($help);
@@ -40,9 +40,9 @@ class Support_HelpController extends Smpe_Mvc_Action
             $revision = array(
                 'HelpID' => $helpID,
                 'UserID' => 1,
-                'CreationTime' => Smpe_Mvc_Bootstrap::$time,
+                'CreationTime' => Smpe_Bootstrap::$time,
                 'Status' => '2',
-                'StatusTime' => Smpe_Mvc_Bootstrap::$time,
+                'StatusTime' => Smpe_Bootstrap::$time,
                 'Body' => $body,
             );
             Support_HelpRevision::data()->insert($revision);
@@ -61,14 +61,14 @@ class Support_HelpController extends Smpe_Mvc_Action
     public function Browse() {
         $this->pagination = array(
             'Where' => array(
-                array('AND', 'a', 'CreationTime', '>=', Smpe_Mvc_Filter::string('CreationTimeMin', INPUT_GET), true),
-                array('AND', 'a', 'CreationTime', '<=', Smpe_Mvc_Filter::string('CreationTimeMax', INPUT_GET), true),
-                array('AND', 'a', 'Title', 'LIKE', Smpe_Mvc_Filter::string('Title', INPUT_GET), true),
-                array('AND', 'b', 'Body', 'LIKE', Smpe_Mvc_Filter::string('Body', INPUT_GET), true),
+                array('AND', 'a', 'CreationTime', '>=', Smpe_InputFilter::string('CreationTimeMin', INPUT_GET), true),
+                array('AND', 'a', 'CreationTime', '<=', Smpe_InputFilter::string('CreationTimeMax', INPUT_GET), true),
+                array('AND', 'a', 'Title', 'LIKE', Smpe_InputFilter::string('Title', INPUT_GET), true),
+                array('AND', 'b', 'Body', 'LIKE', Smpe_InputFilter::string('Body', INPUT_GET), true),
             ),
             'Group' => '',
-            'Order' => Smpe_Mvc_Filter::order('order', INPUT_GET),
-            'PageIndex' => Smpe_Mvc_Filter::int('PageIndex', INPUT_GET),
+            'Order' => Smpe_InputFilter::order('order', INPUT_GET),
+            'PageIndex' => Smpe_InputFilter::int('PageIndex', INPUT_GET),
             'PageSize' => 30,
         );
         Support_Help::data()->page($this->pagination, $this->data['HelpList'], $this->data['HelpCount']);
@@ -94,7 +94,7 @@ class Support_HelpController extends Smpe_Mvc_Action
      * DeleteSubmit
      */
     public function DeleteSubmit() {
-        $helpID = Smpe_Mvc_Filter::intEx('HelpID');
+        $helpID = Smpe_InputFilter::intEx('HelpID');
 
         $this->beginTransaction();
         try {
@@ -126,15 +126,15 @@ class Support_HelpController extends Smpe_Mvc_Action
      * EditSubmit
      */
     public function EditSubmit() {
-        $helpID = Smpe_Mvc_Filter::intEx('HelpID');
-        $helpRevisionID = Smpe_Mvc_Filter::intEx('HelpRevisionID');
-        $title = Smpe_Mvc_Filter::stringEx('Title');
-        $body = Smpe_Mvc_Filter::stringEx('Body');
+        $helpID = Smpe_InputFilter::intEx('HelpID');
+        $helpRevisionID = Smpe_InputFilter::intEx('HelpRevisionID');
+        $title = Smpe_InputFilter::stringEx('Title');
+        $body = Smpe_InputFilter::stringEx('Body');
 
         $this->beginTransaction();
         try {
             $help = array(
-                'UpdateTime' => Smpe_Mvc_Bootstrap::$time,
+                'UpdateTime' => Smpe_Bootstrap::$time,
                 'Title' => $title,
             );
             Support_Help::data()->update($help, array('HelpID'=>$helpID));

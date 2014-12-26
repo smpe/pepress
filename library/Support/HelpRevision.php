@@ -3,22 +3,32 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-class Support_HelpRevision
+class Support_HelpRevision extends Smpe_Db
 {
     /**
-     * @var Smpe_Db_Interface
+     * @var Smpe_DbInterface
      */
-    private static $data = null;
+    protected static $data = null;
 
     /**
-     * @return Smpe_Db_Interface
+     * @var string
      */
-    public static function data()
-    {
-        if(is_null(self::$data)){
-            self::$data = new Smpe_Db_Mysql('Support', 'help_revision', 'HelpRevisionID');
-        }
+    protected static $module = 'Support';
 
-        return self::$data;
-    }
+    /**
+     * @var string
+     */
+    protected static $table  = 'help_revision';
+
+    /**
+     * @var string
+     */
+    protected static $primary = 'HelpRevisionID';
+
+    /**
+     * @var array
+     */
+    protected static $joins = array(
+        'b' => ' INNER JOIN help b ON b.HelpID = a.HelpID ',
+    );
 }

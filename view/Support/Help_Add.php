@@ -6,10 +6,10 @@
 
 <div class="container">
     <div>
-        <a class="btn btn-default" href="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Browse')?>" role="button">Browse</a>
+        <a class="btn btn-default" href="<?php echo Smpe_Url::http('Support', 'Help', 'Browse')?>" role="button">Browse</a>
     </div>
 
-    <form id="form1" method="post" action="<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'AddSubmit')?>">
+    <form id="form1" method="post" action="<?php echo Smpe_Url::http('Support', 'Help', 'AddSubmit')?>">
         <div class="form-group">
             <label for="Title">Title</label>
             <input type="email" class="form-control" id="Title" name="Title" placeholder="Title">
@@ -35,9 +35,9 @@
     </form>
 </div>
 
-<script src="<?php echo Smpe_Mvc_Url::pub('/src/showdown/showdown.js')?>"></script>
-<script src="<?php echo Smpe_Mvc_Url::pub('/src/jquery/jquery.form.js')?>"></script>
-<script src="<?php echo Smpe_Mvc_Url::pub('/src/jquery-validation/jquery.validate.js')?>"></script>
+<script src="<?php echo Smpe_Url::pub('/src/showdown/showdown.js')?>"></script>
+<script src="<?php echo Smpe_Url::pub('/src/jquery/jquery.form.js')?>"></script>
+<script src="<?php echo Smpe_Url::pub('/src/jquery-validation/jquery.validate.js')?>"></script>
 <script>
     // build the converter
     var converter = new Showdown.converter();
@@ -81,7 +81,7 @@
                         if(data.data <= 0) {
                             alert(data.msg)
                         } else {
-                            window.location = "<?php echo Smpe_Mvc_Url::http('Support', 'Help', 'Detail')?>/"+data.data
+                            window.location = "<?php echo Smpe_Url::http('Support', 'Help', 'Detail')?>/"+data.data
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown){
