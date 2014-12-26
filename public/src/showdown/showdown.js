@@ -51,7 +51,7 @@
 //
 //   var text = "Markdown *rocks*.";
 //
-//   var converter = new Showdown.converter();
+//   var converter = new Showdown.Converter();
 //   var html = converter.makeHtml(text);
 //
 //   alert(html);
@@ -88,12 +88,12 @@ var stdExtName = function(s) {
 };
 
 //
-// converter
+// Converter
 //
 // Wraps all "globals" so that the only thing
 // exposed is makeHtml().
 //
-Showdown.converter = function(converter_options) {
+Showdown.Converter = function(converter_options) {
 
 //
 // Globals:
@@ -1438,7 +1438,7 @@ var escapeCharacters_callback = function(wholeMatch,m1) {
 	return "~E"+charCodeToEscape+"E";
 }
 
-} // end of Showdown.converter
+} // end of Showdown.Converter
 
 
 // export

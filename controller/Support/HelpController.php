@@ -48,7 +48,7 @@ class Support_HelpController extends Smpe_Action
             Support_HelpRevision::data()->insert($revision);
 
             $this->commit();
-            return $this->succeed($helpID);
+            return $this->succeed($helpID, Smpe_Url::http('Support', 'Help', 'Detail', $helpID));
         } catch(Exception $e) {
             $this->rollBack();
             return $this->failed($e->getMessage());
@@ -145,7 +145,7 @@ class Support_HelpController extends Smpe_Action
             Support_HelpRevision::data()->update($revision, array('HelpRevisionID'=>$helpRevisionID));
 
             $this->commit();
-            return $this->succeed($helpID);
+            return $this->succeed($helpID, Smpe_Url::http('Support', 'Help', 'Detail', $helpID));
         } catch(Exception $e) {
             $this->rollBack();
             return $this->failed($e->getMessage());

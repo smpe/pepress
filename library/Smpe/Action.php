@@ -38,17 +38,28 @@ class Smpe_Action
      * constructor
      * @param $request
      */
-    public function __construct($request)
-    {
+    public function __construct($request){
         $this->request = $request;
     }
 
     /**
      * Init
      */
-    public function init()
-    {
+    public function init(){
         
+    }
+
+    /**
+     * Get data from $this->data.
+     * @param string $node
+     * @param string $key
+     * @return string
+     */
+    protected function data($node = '', $key = ''){
+        if(isset($this->data[$node][$key])) {
+            return $this->data[$node][$key];
+        }
+        return '';
     }
 
     /**
@@ -85,14 +96,23 @@ class Smpe_Action
     }
 
     /**
+     * Load block file.
+     * @param $module
+     * @param $file
+     */
+    protected function block($module, $file) {
+        $htmlPath = sprintf('%s/block/%s/%s.php',Smpe_Bootstrap::$workingDir, $module, $file);
+        $this->view($htmlPath);
+    }
+
+    /**
      * Load view file.
      * @param string $htmlPath
      * @throws Exception
      */
-    protected function view($htmlPath = '')
-    {
+    protected function view($htmlPath = ''){
         if(empty($htmlPath)) {
-            $htmlPath = sprintf('%s/view/%s/%s_%s.php', Smpe_Bootstrap::$workingDir, $this->request['module'], $this->request['controller'], $this->request['action']);
+            $htmlPath = sprintf('%s/view/%s/%s%s.php', Smpe_Bootstrap::$workingDir, $this->request['module'], $this->request['controller'], $this->request['action']);
         }
 
         if(is_file($htmlPath)){
@@ -108,8 +128,7 @@ class Smpe_Action
      * @param mixed $data
      * @return array
      */
-    protected function failed($message = 'Failed', $data = -1)
-    {
+    protected function failed($message = 'Failed', $data = -1){
         return array('data' => $data, 'msg' => $message);
     }
 
@@ -118,8 +137,7 @@ class Smpe_Action
      * @param string $message
      * @return array
      */
-    protected function succeed($data = '', $message = 'Succeed')
-    {
+    protected function succeed($data = '', $message = 'Succeed'){
         return array('data' => $data, 'msg' => $message);
     }
 
@@ -128,8 +146,7 @@ class Smpe_Action
      * @param string $moduleName
      * @throws Exception
      */
-    protected function beginTransaction($moduleName = '')
-    {
+    protected function beginTransaction($moduleName = ''){
         $obj = $this->transactionObj($moduleName);
         if($obj->beginTransaction() === false){
             throw new Exception('Begin transaction error.');
@@ -141,8 +158,7 @@ class Smpe_Action
      * @param string $moduleName
      * @throws Exception
      */
-    protected function commit($moduleName = '')
-    {
+    protected function commit($moduleName = ''){
         $obj = $this->transactionObj($moduleName);
         if($obj->commit() === false){
             throw new Exception('Commit transaction error.');
@@ -154,8 +170,7 @@ class Smpe_Action
      * @param string $moduleName
      * @throws Exception
      */
-    protected function rollBack($moduleName = '')
-    {
+    protected function rollBack($moduleName = ''){
         $obj = $this->transactionObj($moduleName);
         $obj->rollBack();
     }
@@ -178,7 +193,7 @@ class Smpe_Action
             throw new Exception('Module DB type error.');
         }
 
-        $obj = array('Smpe_Db_'.Config::$dsn[Config::$modules[$moduleName]['dsn']]['type'], 'db');
+        $obj = array('Smpe_Db'.Config::$dsn[Config::$modules[$moduleName]['dsn']]['type'], 'db');
         return call_user_func_array($obj, array($moduleName));
     }
 }
