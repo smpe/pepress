@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-class Smpe_Db
+class Smpe_Model
 {
     /**
      * @return Smpe_DbInterface
@@ -13,14 +13,14 @@ class Smpe_Db
     {
         if(is_null(static::$data)){
             if(!isset(Config::$modules[static::$module]['dsn'])) {
-                $err = Smpe_Locale::parse('Config not exists: ', "Config::\$modules['%s']['dsn']");
+                $err = Smpe_I18in::smpe('Config not exists: ', "Config::\$modules['%s']['dsn']");
                 throw new Exception(sprintf($err, static::$module));
             }
 
             $dsnKey = Config::$modules[static::$module]['dsn'];
 
             if(!isset(Config::$dsn[$dsnKey]['type'])) {
-                $err = Smpe_Locale::parse('Config not exists: ', "Config::\$dsn['%s']['type']");
+                $err = Smpe_I18in::smpe('Config not exists: ', "Config::\$dsn['%s']['type']");
                 throw new Exception(sprintf($err, $dsnKey));
             }
 
@@ -33,4 +33,12 @@ class Smpe_Db
         return static::$data;
     }
 
+    /**
+     * @param $str
+     * @param string $origin
+     * @return mixed
+     */
+    public static function i18in($str, $origin = '') {
+        return Smpe_Bootstrap::i18in(static::$module, $str, $origin);
+    }
 }

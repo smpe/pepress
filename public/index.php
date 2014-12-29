@@ -5,4 +5,4 @@
 
 $workingDir = realpath(dirname(__FILE__) . '/../');
 require $workingDir . '/library/Smpe/Bootstrap.php';
-Smpe_Bootstrap::run($workingDir);
+Smpe_Bootstrap::init($workingDir);

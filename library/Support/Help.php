@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-class Support_Help extends Smpe_Db
+class Support_Help extends Smpe_Model
 {
     /**
      * @var Smpe_DbInterface

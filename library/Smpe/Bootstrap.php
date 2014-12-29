@@ -3,7 +3,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//define('REQUEST_TIME_FLOAT', microtime(true));
 mb_internal_encoding('utf-8');
 header("Content-type: text/html; charset=UTF-8");
 
@@ -25,6 +24,11 @@ class Smpe_Bootstrap
     public static $workingDir = '';
 
     /**
+     * @var string
+     */
+    public static $lang = array('code'=>'en_US', 'name'=>'en-US');
+
+    /**
      * @var array
      */
     public static $request = array(
@@ -36,6 +40,64 @@ class Smpe_Bootstrap
         'host' => '',
         'domain' => '',
     );
+
+    /**
+     * Run application
+     * @param $workingDir
+     * @param string $configPath
+     */
+    public static function init($workingDir, $configPath = '') {
+        try {
+            self::initWorkingDir($workingDir);
+            self::initDomain();
+            self::initAutoload();
+            self::initConfig($configPath);
+            self::initLanguage();
+            self::initLog();
+            self::initRequest();
+            self::initActionName();
+            self::initController();
+            $r = self::initAction();
+        } catch (Exception $e) {
+            $r = array('data'=>-1, 'msg'=>$e->getMessage());
+        }
+
+        self::result($r);
+
+        if(Config::$environment < 2) {
+            $t = number_format(microtime(true)-$_SERVER['REQUEST_TIME_FLOAT'], 4, '.', '');
+            self::log(sprintf("%s: Consuming time %ss (%s)\n", self::$time, $t, $_SERVER['REQUEST_URI']));
+        }
+    }
+
+    /**
+     * @param $message
+     * @param string $scope
+     * @param array $options
+     * @return int
+     */
+    public static function log($message, $scope = 'smpe', $options = array()) {
+        return file_put_contents(self::$workingDir.'/data/log/'.$scope.'.log', $message, FILE_APPEND|LOCK_EX);
+    }
+
+    /**
+     * @param $mdoule
+     * @param $str
+     * @param string $origin
+     * @return mixed
+     */
+    public static function i18in($mdoule, $str, $origin = '') {
+        if(self::$lang['code'] == 'en_US') {
+            return $str.$origin;
+        } else {
+            $cls = $mdoule.'_'.self::$lang['code'];
+            if(class_exists($cls)) {
+                return $cls::parse($str, $origin);
+            } else {
+                return $str.$origin;
+            }
+        }
+    }
 
     /**
      * @var object
@@ -83,8 +145,21 @@ class Smpe_Bootstrap
         if(is_file($path)) {
             require $path;
         } else {
-            throw new Exception('Cannot load configuration file: '.$path);
+            throw new Exception(Smpe_I18in::smpe('Cannot load configuration file: ', $path));
         }
+    }
+
+    /**
+     * language
+     */
+    private static function initLanguage() {
+        $s = Smpe_InputFilter::string('HTTP_ACCEPT_LANGUAGE');
+        if(is_null($s) || $s === false) {
+            return;
+        }
+
+        self::$lang['name'] = locale_accept_from_http($s);
+        self::$lang['code'] = str_replace('-', '_', self::$lang['name']);
     }
 
     /**
@@ -124,18 +199,18 @@ class Smpe_Bootstrap
     }
 
     /**
-     *
+     * ActionName
      * @throws Exception
      */
     private static function initActionName() {
         $a = ord(self::$request['action']);
         if($a < 65 || $a > 90) {
-            throw new Exception('The first letter of the method name must be capitalized: '.self::$request['action']);
+            throw new Exception(Smpe_I18in::smpe('The first letter of the method name must be capitalized: ', self::$request['action']));
         }
     }
 
     /**
-     *
+     * Arguments
      */
     private static function initArgs() {
         //vDir
@@ -164,7 +239,7 @@ class Smpe_Bootstrap
         $s = "%s/controller/%s/%sController.php";
         $path = sprintf($s, self::$workingDir, self::$request['module'], self::$request['controller']);
         if(!is_file($path)){
-            throw new Exception('Cannot load controller file: '.$path);
+            throw new Exception(Smpe_I18in::smpe('Cannot load controller file: ', $path));
         }
 
         require $path;
@@ -177,17 +252,19 @@ class Smpe_Bootstrap
     private static function initAction() {
         $className = sprintf("%s_%sController", self::$request['module'], self::$request['controller']);
         if(!class_exists($className)){
-            throw new Exception('Class not exists: '.$className);
+            throw new Exception(Smpe_I18in::smpe('Class not exists: ', $className));
         }
 
-        self::$action  = new $className(self::$request);
+        self::$action  = new $className();
 
         if(!method_exists(self::$action, self::$request['action'])){
-            throw new Exception('Method not exists: '.$className.'->'.self::$request['action']);
+            throw new Exception(Smpe_I18in::smpe('Method not exists: ', $className.'->'.self::$request['action']));
         }
 
+        // User can write custorm code in this method.
         self::$action->init();
 
+        // If init() is ok, start the action.
         return call_user_func_array(array(self::$action, self::$request['action']), self::$request['args']);
     }
 
@@ -202,8 +279,7 @@ class Smpe_Bootstrap
         if(is_file($path)) {
             require $path;
         } else {
-            $m = 'File not exists: '.$path."\n";
-            file_put_contents(self::$workingDir.'/data/log/smpe.log', $m, FILE_APPEND|LOCK_EX);
+            self::log(Smpe_I18in::smpe('File not exists: ', $path."\n"));
         }
     }
 
@@ -230,45 +306,5 @@ class Smpe_Bootstrap
         } else { //GET
             self::$action->error($r['msg'], $r['data']);
         }
-    }
-
-    /**
-     * Run application
-     * @param $workingDir
-     * @param string $configPath
-     */
-    public static function run($workingDir, $configPath = '') {
-        try {
-            self::initWorkingDir($workingDir);
-            self::initDomain();
-            self::initAutoload();
-            self::initConfig($configPath);
-            self::initLog();
-            self::initRequest();
-            self::initActionName();
-            self::initController();
-            $r = self::initAction();
-        } catch (Exception $e) {
-            $r = array('data'=>-1, 'msg'=>$e->getMessage());
-        }
-
-        self::result($r);
-
-        if(Config::$environment < 2) {
-            $t = number_format(microtime(true)-$_SERVER['REQUEST_TIME_FLOAT'], 4, '.', '');
-            $m = sprintf("%s: Consuming time %ss (%s)\n", self::$time, $t, $_SERVER['REQUEST_URI']);
-            //error_log($m, 3, self::$workingDir.'/data/log/smpe.log'); //Conflict
-            file_put_contents(self::$workingDir.'/data/log/smpe.log', $m, FILE_APPEND|LOCK_EX);
-        }
-    }
-
-    /**
-     * Write log message.
-     * @param string $message
-     * @param string $scope
-     * @param array $options
-     */
-    public static function log($message, $scope = 'smpe', $options = array()) {
-
     }
 }

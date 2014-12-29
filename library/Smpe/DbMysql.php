@@ -6,31 +6,6 @@
 class Smpe_DbMysql implements Smpe_DbInterface
 {
     /**
-     * @var string module name
-     */
-    private $module  = '';
-
-    /**
-     * @var string table name
-     */
-    private $table   = '';
-
-    /**
-     * @var string primary
-     */
-    private $primary = '';
-
-    /**
-     * @var array join tables
-     */
-    private $joins = array();
-
-    /**
-     * @var PDO database instance
-     */
-    private static $db = array();
-
-    /**
      * @var int Query counter
      */
     public static $queries = 0;
@@ -276,6 +251,31 @@ class Smpe_DbMysql implements Smpe_DbInterface
         $sql = sprintf('DELETE FROM `%s` WHERE %s', $this->table, $where['where']);
         return $this->query($sql, $where['param'])->rowCount();
     }
+
+    /**
+     * @var string module name
+     */
+    private $module  = '';
+
+    /**
+     * @var string table name
+     */
+    private $table   = '';
+
+    /**
+     * @var string primary
+     */
+    private $primary = '';
+
+    /**
+     * @var array join tables
+     */
+    private $joins = array();
+
+    /**
+     * @var PDO database instance
+     */
+    private static $db = array();
 
     /**
      * Build Conditions
