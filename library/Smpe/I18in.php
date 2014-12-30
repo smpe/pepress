@@ -15,7 +15,7 @@ class Smpe_I18in
 			return static::$nodes[$str].$origin;
 		} else {
 			// Save log.
-            Smpe_Bootstrap::log($str, 'i18in');
+            Smpe_Application::log($str, 'i18in');
 			return $str.$origin;
 		}
 	}
@@ -26,6 +26,6 @@ class Smpe_I18in
 	 * @return string
 	 */
 	public static function smpe($str, $origin = '') {
-		return Smpe_Bootstrap::i18in('Smpe', $str, $origin);
+		return Smpe_Application::i18in('Smpe', $str, $origin);
 	}
 }

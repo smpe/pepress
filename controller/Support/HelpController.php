@@ -31,8 +31,8 @@ class Support_HelpController extends Smpe_Action
         try {
             $help = array(
                 'UserID' => 1,
-                'CreationTime' => Smpe_Bootstrap::$time,
-                'UpdateTime' => Smpe_Bootstrap::$time,
+                'CreationTime' => Smpe_Application::$time,
+                'UpdateTime' => Smpe_Application::$time,
                 'Title' => $title,
             );
             $helpID = Support_Help::data()->insert($help);
@@ -40,9 +40,9 @@ class Support_HelpController extends Smpe_Action
             $revision = array(
                 'HelpID' => $helpID,
                 'UserID' => 1,
-                'CreationTime' => Smpe_Bootstrap::$time,
+                'CreationTime' => Smpe_Application::$time,
                 'Status' => '2',
-                'StatusTime' => Smpe_Bootstrap::$time,
+                'StatusTime' => Smpe_Application::$time,
                 'Body' => $body,
             );
             Support_HelpRevision::data()->insert($revision);
@@ -134,7 +134,7 @@ class Support_HelpController extends Smpe_Action
         $this->beginTransaction();
         try {
             $help = array(
-                'UpdateTime' => Smpe_Bootstrap::$time,
+                'UpdateTime' => Smpe_Application::$time,
                 'Title' => $title,
             );
             Support_Help::data()->update($help, array('HelpID'=>$helpID));

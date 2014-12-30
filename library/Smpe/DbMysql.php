@@ -206,7 +206,7 @@ class Smpe_DbMysql implements Smpe_DbInterface
     }
 
     /**
-     * Added (single, multi-line)
+     * Add data (single, multi-line)
      * @param mixed $data
      * @return number
      */
@@ -230,7 +230,7 @@ class Smpe_DbMysql implements Smpe_DbInterface
     }
 
     /**
-     * update
+     * Update
      * @param mixed $data
      * @param mixed $filter
      * @return number
@@ -242,7 +242,7 @@ class Smpe_DbMysql implements Smpe_DbInterface
     }
 
     /**
-     * delete
+     * Deleting data.
      * @param mixed $filter
      * @return number
      */
@@ -278,7 +278,22 @@ class Smpe_DbMysql implements Smpe_DbInterface
     private static $db = array();
 
     /**
-     * Build Conditions
+     * Build Conditions. <br>
+     *
+     * Simple search. <br>
+     * $filter = array('user_id' => '2', 'gender' => 'male'); <br>
+     *
+     * Advanced Search: <br>
+     * $filter = array( <br>
+     *     array('AND', 'a', 'field_a', '=',     monle_filter::datetime('field1', INPUT_GET), true), <br>
+     *     array('OR',  'a', 'field_b', '<',     monle_filter::datetime('field1', INPUT_GET)), <br>
+     *     array('AND', 'a', 'field_c', 'RLIKE', monle_filter::datetime('field1', INPUT_GET)), <br>
+     *     array('AND', 'a', 'field_d', 'IN',    array('1', '2')), <br>
+     *     array('AND', '',  '',        '(',     array( //复合条件 <br>
+     *         array('AND', 'a', 'field_e', '=',     monle_filter::datetime('field1', INPUT_GET)), <br>
+     *     )), <br>
+     * ); <br>
+     *
      * @param array $filter
      * @param string $group
      * @param array $order
@@ -286,24 +301,6 @@ class Smpe_DbMysql implements Smpe_DbInterface
      */
     private function where($filter, $group = '', $order = array()) {
         $result = array('join_tables' => array(), 'join' => '', 'where' => ' 1 ', 'param' => array());
-
-        /*
-            Advanced Search
-            $filter = array(
-                array('AND', 'a', 'field_a', '=',     monle_filter::datetime('field1', INPUT_GET), true),
-                array('OR',  'a', 'field_b', '<',     monle_filter::datetime('field1', INPUT_GET)),
-                array('AND', 'a', 'field_c', 'RLIKE', monle_filter::datetime('field1', INPUT_GET)),
-                array('AND', 'a', 'field_d', 'IN',    array('1', '2')),
-                array('AND', '',  '',        '(',     array( //复合条件
-                    array('AND', 'a', 'field_e', '=',     monle_filter::datetime('field1', INPUT_GET)),
-                )),
-            );
-        */
-
-        /*
-            Simple search
-            $filter = array('user_id' => '2', 'gender' => 'male');
-        */
 
         if(isset($filter[0])){ //Advanced Search
             foreach($filter as $item){
@@ -316,8 +313,7 @@ class Smpe_DbMysql implements Smpe_DbInterface
                     $result['join'] .= $this->joins[$alias];
                 }
             }
-        }
-        else{ //Simple search
+        } else { //Simple search
             foreach($filter as $key => $value){
                 $result['where'] .= sprintf(" AND `%s` = :%s ", $key, $key);
                 $result['param'][$key] = $value;
@@ -366,23 +362,18 @@ class Smpe_DbMysql implements Smpe_DbInterface
     }
 
     /**
-     * 构建单个条件
+     * Build a single condition <br>
+     * $item[0] Logical connection conditions, e.g. AND,OR <br>
+     * $item[1] Alias table, e.g. a <br>
+     * $item[2] Field, e.g. a.user_id <br>
+     * $item[3] Comparison of conditions, e.g. =,LIKE <br>
+     * $item[4] Value <br>
+     * $item[5] Strict Mode, true or false <br>
      * @param array $result
      * @param array $item
      */
     private function whereItem(&$result, $item) {
-        //personal_message, money_transaction中有复合查询的应用例子
-
-        /*
-         $item[0] 逻辑连接条件, 例如: AND,OR
-         $item[1] 表的别名, 例如: a
-         $item[2] 字段, 例如: a.user_id
-         $item[3] 比较条件, 例如: =,LIKE
-         $item[4] 值
-         $item[5] 是否允许忽略此字段, true:允许, false:禁止
-         */
-
-        if(is_null($item[4]) || $item[4] === false || (isset($item[5]) && $item[5] === true && $item[4] == '')){
+        if(is_null($item[4]) || $item[4] === false || (isset($item[5]) && $item[5] === false && $item[4] == '')){
             return;
         }
 
@@ -437,7 +428,7 @@ class Smpe_DbMysql implements Smpe_DbInterface
     }
 
     /**
-     * 对字段加``
+     * Quote a field with ``.
      * @param $tableAlias
      * @param $field
      * @param $params

@@ -6,7 +6,7 @@
 mb_internal_encoding('utf-8');
 header("Content-type: text/html; charset=UTF-8");
 
-class Smpe_Bootstrap
+class Smpe_Application
 {
     /**
      * @var string
@@ -130,7 +130,7 @@ class Smpe_Bootstrap
      * Autoload class
      */
     private static function initAutoload() {
-        spl_autoload_register('Smpe_Bootstrap::autoload');
+        spl_autoload_register('Smpe_Application::autoload');
     }
 
     /**

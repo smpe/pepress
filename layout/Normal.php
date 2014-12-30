@@ -44,7 +44,7 @@
 </nav>
 <?php $this->view();?>
 <script>
-    var c = "<?php echo Smpe_Bootstrap::$request['controller']?>"
+    var c = "<?php echo Smpe_Application::$request['controller']?>"
     switch(c) {
         case "Help": c = "Help"; break
         case "About": c = "About"; break

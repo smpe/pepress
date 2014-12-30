@@ -39,6 +39,6 @@ class Smpe_Model
      * @return mixed
      */
     public static function i18in($str, $origin = '') {
-        return Smpe_Bootstrap::i18in(static::$module, $str, $origin);
+        return Smpe_Application::i18in(static::$module, $str, $origin);
     }
 }

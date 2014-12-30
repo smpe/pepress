@@ -25,7 +25,7 @@ class Smpe_Action
      * @return mixed
      */
     public static function i18in($str, $origin = '') {
-        return Smpe_Bootstrap::i18in(Smpe_Bootstrap::$request['module'], $str, $origin);
+        return Smpe_Application::i18in(Smpe_Application::$request['module'], $str, $origin);
     }
 
     /**
@@ -91,7 +91,7 @@ class Smpe_Action
     */
     protected function layout($layout = 'Normal') {
         //ob_start();
-        $htmlPath = sprintf('%s/layout/%s.php',Smpe_Bootstrap::$workingDir, $layout);
+        $htmlPath = sprintf('%s/layout/%s.php',Smpe_Application::$workingDir, $layout);
         $this->view($htmlPath);
         //header('Content-Length: '.ob_get_length());
         //ob_end_flush();
@@ -103,7 +103,7 @@ class Smpe_Action
      * @param $file
      */
     protected function block($module, $file) {
-        $htmlPath = sprintf('%s/block/%s/%s.php',Smpe_Bootstrap::$workingDir, $module, $file);
+        $htmlPath = sprintf('%s/block/%s/%s.php',Smpe_Application::$workingDir, $module, $file);
         $this->view($htmlPath);
     }
 
@@ -116,10 +116,10 @@ class Smpe_Action
         if(empty($htmlPath)) {
             $htmlPath = sprintf(
                 '%s/view/%s/%s%s.php',
-                Smpe_Bootstrap::$workingDir,
-                Smpe_Bootstrap::$request['module'],
-                Smpe_Bootstrap::$request['controller'],
-                Smpe_Bootstrap::$request['action']
+                Smpe_Application::$workingDir,
+                Smpe_Application::$request['module'],
+                Smpe_Application::$request['controller'],
+                Smpe_Application::$request['action']
             );
         }
 
@@ -190,7 +190,7 @@ class Smpe_Action
      */
     private function transactionObj($moduleName = '') {
         if(empty($moduleName)) {
-            $moduleName = Smpe_Bootstrap::$request['module'];
+            $moduleName = Smpe_Application::$request['module'];
         }
 
         if(!isset(Config::$modules[$moduleName]['dsn']) || !isset(Config::$dsn[Config::$modules[$moduleName]['dsn']])){
