@@ -1,4 +1,3 @@
-pepress
-=======
+# pepress
 
-smpe demo.
+Smpe demo.

@@ -3,6 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -43,6 +44,10 @@
     </div>
 </nav>
 <?php $this->view();?>
+<footer class="footer">
+    <p>Starter template built for <a href="https://github.com/smpe/Smpe">Smpe</a> by <a href="http://getbootstrap.com">Bootstrap</a>.</p>
+    <p><a href="#">Back to top</a></p>
+</footer>
 <script>
     var c = "<?php echo Smpe_Application::$request['controller']?>"
     switch(c) {
