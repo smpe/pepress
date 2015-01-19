@@ -1,3 +1,9 @@
+<?php
+// Copyright 2015 The Smpe Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+?>
+
 <input type="hidden" id="HelpID" name="HelpID" value="<?php echo $this->data('Help', 'HelpID')?>">
 <input type="hidden" id="HelpRevisionID" name="HelpRevisionID" value="<?php echo $this->data('HelpRevision', 'HelpRevisionID')?>">
 <div class="form-group">
