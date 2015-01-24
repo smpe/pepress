@@ -14,13 +14,13 @@ git clone https://github.com/smpe/Smpe.git pepress/library/Smpe
 Create database:
 
 ```sql
-CREATE DATABASE `pepress` CHARACTER SET utf8 COLLATE utf8_general_ci
+CREATE DATABASE `support` CHARACTER SET utf8 COLLATE utf8_general_ci
 ```
 
 Create tables:
 
 ```bash
-mysql -hlocalhost -uroot -ppass --quick --default-character-set=utf8 pepress < /path/to/pepress/library/Support/Support.sql
+mysql -hlocalhost -uroot -ppass --quick --default-character-set=utf8 support < /path/to/pepress/library/Support/Support.sql
 ```
 
 Type the address in web browser location box:
