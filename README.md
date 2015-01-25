@@ -2,7 +2,22 @@
 
 Demonstration project.
 
-Usage:
+## Installation
+
+First, be sure that all dependencies are installed:
+  * Apache httpd 2.x.x / Nginx 1.x.x
+  * PHP (5.3.x/5.4.x/5.5.x)
+    * php_curl
+    * php_mbstring
+    * php_pdo
+    * php_pdo_mysql
+    * php_amqp [+]
+    * php_gd2 [+]
+    * php_imagick [+]
+    * php_memcache [+]
+    * php_redis [+]
+  * PHP-FPM
+  * MySQL (5.1/5.5)
 
 Get the source:
 
@@ -29,7 +44,7 @@ Type the address in web browser location box:
 http://localhost/pepress/public/
 ```
 
-[Feedback](http://github.com/smpe)
+[Feedback](https://github.com/smpe/Smpe/issues)
 
 # Copyright
 
