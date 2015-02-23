@@ -7,7 +7,7 @@
 <div class="container">
     <div class="text-right">
         <a class="btn btn-default" href="<?php echo Smpe_Url::http('Support', 'Help', 'Browse')?>" role="button">Browse</a>
-        <a class="btn btn-default" href="<?php echo Smpe_Url::http('Support', 'Help', 'Edit', $this->data['Help']['HelpID'])?>" role="button">Edit</a>
+        <a class="btn btn-default" href="<?php echo Smpe_Url::http('Support', 'Help', 'Edit', array($this->data['Help']['HelpID']))?>" role="button">Edit</a>
         <a class="btn btn-default" href="javascript:deleteHelp(<?php echo $this->data['Help']['HelpID']?>);" role="button">Delete</a>
     </div>
     <div class="hide" id="help_body"><?php echo $this->data['HelpRevision']['Body']?></div>

@@ -23,8 +23,8 @@
             <tr>
                 <th scope="row"><?php echo $val['HelpID']?></th>
                 <td><?php echo $val['Title']?> </td>
-                <td><a href="<?php echo Smpe_Url::http('Support', 'Help', 'Detail', $val['HelpID'])?>">Detail</a> </td>
-                <td><a href="<?php echo Smpe_Url::http('Support', 'Help', 'Edit', $val['HelpID'])?>">Edit</a> </td>
+                <td><a href="<?php echo Smpe_Url::http('Support', 'Help', 'Detail', array($val['HelpID']))?>">Detail</a> </td>
+                <td><a href="<?php echo Smpe_Url::http('Support', 'Help', 'Edit', array($val['HelpID']))?>">Edit</a> </td>
                 <td><a href="javascript:deleteHelp(<?php echo $val['HelpID']?>);">Delete</a> </td>
             </tr>
         <?php }?>

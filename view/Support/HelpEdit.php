@@ -7,7 +7,7 @@
 <div class="container">
     <div class="text-right">
         <a class="btn btn-default" href="<?php echo Smpe_Url::http('Support', 'Help', 'Browse')?>" role="button">Browse</a>
-        <a class="btn btn-default" href="<?php echo Smpe_Url::http('Support', 'Help', 'Detail', $this->data['Help']['HelpID'])?>" role="button">View</a>
+        <a class="btn btn-default" href="<?php echo Smpe_Url::http('Support', 'Help', 'Detail', array($this->data['Help']['HelpID']))?>" role="button">View</a>
     </div>
 
     <form id="form1" method="post" action="<?php echo Smpe_Url::http('Support', 'Help', 'EditSubmit')?>">
